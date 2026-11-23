@@ -6,7 +6,7 @@ Foundry VTT v14. Requires Dicer 1.4.2 or later.
 
 ## Install
 
-Install with the manifest URL:
+Paste this manifest URL into **Add-on Modules → Install Module**:
 
 ```
 https://github.com/0utrider/dicey/releases/latest/download/module.json
@@ -14,7 +14,7 @@ https://github.com/0utrider/dicey/releases/latest/download/module.json
 
 ## What's in 0.0.1
 
-A set of 14 damage type dice themes, built for readable numbers (every theme uses the blackletter font, including over animated interiors): acid, bleed, cold, electricity, fire, force, mental, physical, poison, precision, sonic, spirit, vitality, void.
+A set of 14 damage type dice themes plus Starry Night, built for readable numbers (every theme uses the blackletter font, including over animated interiors): acid, bleed, cold, electricity, fire, force, mental, physical, poison, precision, sonic, spirit, vitality, void.
 
 They show up in Dicer's theme browser as `Dicey: Fire`, `Dicey: Cold` and so on, with a landing effect and sound where the matching Dicer built-in has one.
 
