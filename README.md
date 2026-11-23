@@ -1,5 +1,11 @@
 # Things Got Dicey
 
+<div align="center">
+
+[![Available on Foundry Package Browser](https://img.shields.io/badge/Foundry-Package%20Page-7000d6?style=for-the-badge)](https://foundryvtt.com/packages/dicey)
+
+</div>
+
 An unofficial theme pack for [Dicer](https://github.com/roileaf/dicer): custom dice sets, textures, and roll effects.
 
 Foundry VTT v14. Requires Dicer 1.4.2 or later.
