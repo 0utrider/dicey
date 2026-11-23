@@ -2,6 +2,7 @@
 
 <div align="center">
 
+[![Part of Outrider's Outpost](https://img.shields.io/badge/Part%20of-Outrider%27s%20Outpost-7000d6?style=for-the-badge)](https://github.com/0utrider/pathfinder)
 [![Available on Foundry Package Browser](https://img.shields.io/badge/Foundry-Package%20Page-7000d6?style=for-the-badge)](https://foundryvtt.com/packages/dicey)
 
 </div>
