@@ -1,4 +1,4 @@
-import { MODULE_ID } from "./constants.js";
+import { DATA_ID, PACKAGE_ID, prodActive } from "./constants.js";
 import { FEATURES } from "./features/index.js";
 
 function runPhase(phase) {
@@ -6,14 +6,24 @@ function runPhase(phase) {
     try {
       feature[phase]?.();
     } catch (err) {
-      console.error(`${MODULE_ID} | feature "${feature.id}" failed during ${phase}`, err);
+      console.error(`${PACKAGE_ID} | feature "${feature.id}" failed during ${phase}`, err);
     }
   }
 }
 
 Hooks.once("init", () => {
-  game.modules.get(MODULE_ID).api = {};
+  if (prodActive()) return;
+  game.modules.get(PACKAGE_ID).api = {};
   runPhase("init");
 });
 
-Hooks.once("ready", () => runPhase("ready"));
+Hooks.once("ready", () => {
+  if (prodActive()) {
+    ui.notifications.error(
+      `${PACKAGE_ID} is not loaded because ${DATA_ID} is active in this world. Disable one of them.`,
+      { permanent: true },
+    );
+    return;
+  }
+  runPhase("ready");
+});

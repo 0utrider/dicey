@@ -1,0 +1,15 @@
+{
+  "_id": "dcyMacSettings01",
+  "name": "Dicey Settings",
+  "type": "script",
+  "img": "modules/dicey/assets/icons/dicey-64.webp",
+  "scope": "global",
+  "command": "// Opens the Things Got Dicey settings window.\n// Part of Outrider's Outpost - 0utrider.github.io/outpost\nconst id = [\"dicey\", \"dicey-dev\"].find((m) => game.modules.get(m)?.active);\nconst menu = id && game.settings.menus.get(`${id}.settingsWindow`);\nif (menu) new menu.type().render({ force: true });\nelse ui.notifications.warn(\"Things Got Dicey is not active in this world.\");\n",
+  "folder": null,
+  "sort": 100000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!macros!dcyMacSettings01"
+}

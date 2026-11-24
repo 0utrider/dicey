@@ -1,0 +1,61 @@
+<div class="dicey-set-root">
+  <header class="dicey-set-top">
+    <img class="dicey-set-logo" src="{{icon}}" alt="">
+    <input type="search" class="dicey-set-search" value="{{query}}" placeholder="{{localize "DICEY.Settings.Search"}}" aria-label="{{localize "DICEY.Settings.Search"}}" autocomplete="off" spellcheck="false">
+    <p class="dicey-set-note">{{note}}</p>
+  </header>
+  <div class="dicey-set-body">
+    <nav class="dicey-set-nav">
+      {{#each tabs}}
+        <button type="button" class="dicey-set-tab {{#if active}}active{{/if}}" data-action="tab" data-tab="{{id}}"><i class="{{icon}}"></i> {{label}}</button>
+      {{/each}}
+    </nav>
+    <div class="dicey-set-panels">
+      {{#each tabs}}
+      <section class="dicey-set-panel {{#if active}}active{{/if}}" data-panel="{{id}}">
+        <header class="dicey-set-panel-head"><h3>{{label}}</h3></header>
+        {{#each rows}}
+        <div class="dicey-set-row {{#if locked}}is-locked{{/if}}" data-row="{{key}}">
+          <div class="dicey-set-text">
+            <strong>{{label}}</strong>
+            <p>{{hint}}</p>
+            {{#if lockNote}}<p class="dicey-set-lock"><i class="fa-solid {{#if locked}}fa-lock{{else}}fa-user-shield{{/if}}"></i> {{lockNote}}</p>{{/if}}
+          </div>
+          <div class="dicey-set-controls">
+            {{#if isSwitch}}
+              <label class="dicey-set-toggle"><input type="checkbox" name="{{key}}" {{#if checked}}checked{{/if}} {{#if locked}}disabled{{/if}}><span class="dicey-set-slider"></span></label>
+            {{/if}}
+            {{#if isSelect}}
+              <select name="{{key}}" {{#if locked}}disabled{{/if}}>
+                {{#each options}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+              </select>
+            {{/if}}
+            {{#if policyBox}}
+              <label class="dicey-set-policy dicey-policy-{{policyMode}}" data-tooltip="DICEY.Settings.EveryoneHint">
+                <span>{{localize "DICEY.Settings.Everyone"}}</span>
+                <select name="policy.{{key}}">
+                  {{#each policy}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+                </select>
+              </label>
+            {{/if}}
+            <button type="button" class="dicey-set-reset-field" data-action="reset" data-key="{{key}}" data-tooltip="DICEY.Settings.ResetFieldHint" aria-label="{{localize "DICEY.Settings.ResetFieldHint"}}"><i class="fa-solid fa-rotate-left"></i></button>
+          </div>
+          {{#if isChecklist}}
+          <ul class="dicey-set-holidays">
+            {{#each items}}
+              <li><label class="{{#if badge}}is-in-season{{/if}}"><input type="checkbox" name="{{../key}}" value="{{value}}" {{#if checked}}checked{{/if}} {{#if ../locked}}disabled{{/if}}> {{#if icon}}<i class="{{icon}}"></i> {{/if}}{{label}}</label></li>
+            {{/each}}
+          </ul>
+          {{/if}}
+        </div>
+        {{/each}}
+      </section>
+      {{/each}}
+    </div>
+  </div>
+  <footer class="dicey-set-footer">
+    <button type="button" class="dicey-set-themes" data-action="openThemes" data-tooltip="DICEY.Settings.OpenThemesHint"><i class="fa-solid fa-dice-d20"></i> {{localize "DICEY.Settings.OpenThemes"}}</button>
+    <button type="button" data-action="resetAll" data-tooltip="DICEY.Settings.ResetAllHint"><i class="fa-solid fa-arrow-rotate-left"></i> {{localize "DICEY.Settings.ResetAll"}}</button>
+    <button type="submit" class="bright"><i class="fa-solid fa-floppy-disk"></i> {{localize "DICEY.Settings.Save"}}</button>
+  </footer>
+</div>

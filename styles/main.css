@@ -1,1 +1,535 @@
 /* Things Got Dicey */
+
+/* Outrider brand (see the Outrider mods branding guide). The ink mixes the brand with the text
+   color, so it reads light on dark sheets and dark on light ones. */
+.dicer-theme-browser {
+  --dicey-brand: #7000d6;
+  --dicey-brand-hover: #8f00ff;
+  --dicey-ink: color-mix(in srgb, var(--dicey-brand) 45%, var(--color-text-primary, #e8e2d6));
+}
+
+/* Every Dicey card: a purple frame and a faint purple wash at the top. */
+.dicer-theme-browser .dicer-theme-card.dicey-card {
+  border-color: color-mix(in srgb, var(--dicey-brand) 75%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--dicey-brand) 22%, var(--dicer-surface)) 0%,
+    var(--dicer-surface) 60%
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--dicey-brand) 20%, transparent);
+}
+.dicer-theme-browser .dicer-theme-card.dicey-card:hover {
+  border-color: var(--dicey-brand-hover);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--dicey-brand) 32%, var(--dicer-surface-strong)) 0%,
+    var(--dicer-surface-strong) 60%
+  );
+}
+.dicer-theme-browser .dicer-theme-card.dicey-card .dicer-stage {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--dicey-brand) 45%, transparent);
+}
+/* Selected keeps Dicer's accent border, with a purple glow so it still reads as ours. */
+.dicer-theme-browser .dicer-theme-card.dicey-card.is-selected {
+  border-color: var(--dicer-accent);
+  box-shadow:
+    0 0 0 1px var(--dicer-accent),
+    0 0 12px color-mix(in srgb, var(--dicey-brand-hover) 55%, transparent);
+}
+
+/* Badges on cards and in the detail panel. */
+.dicer-theme-browser :is(.dicey-card, .dicey-card.dicer-theme-detail) .dicer-badge {
+  border-color: color-mix(in srgb, var(--dicey-brand) 70%, transparent);
+  background: color-mix(in srgb, var(--dicey-brand) 16%, transparent);
+  color: var(--dicey-ink);
+}
+.dicer-theme-browser .dicey-holiday.dicey-in-season .dicer-badge {
+  border-color: var(--dicey-brand-hover);
+  background: var(--dicey-brand);
+  color: #fff;
+}
+.dicer-theme-browser .dicey-holiday .dicer-badge .dicey-icon {
+  font-size: 0.95em;
+}
+/* Off-season holiday dice sit back a little. */
+.dicer-theme-browser .dicer-theme-card.dicey-holiday:not(.dicey-in-season):not(.is-selected) .dicer-stage {
+  opacity: 0.8;
+}
+
+/* The Dicey and Holidays tabs. */
+.dicer-theme-browser .dicer-segmented button.dicey-tab {
+  --button-text-color: var(--dicey-ink);
+  --button-hover-background-color: color-mix(in srgb, var(--dicey-brand) 30%, transparent);
+  --button-hover-text-color: var(--color-text-emphatic, #fff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--dicey-brand) 55%, transparent);
+}
+.dicer-theme-browser .dicer-segmented button.dicey-tab.active {
+  --button-background-color: var(--dicey-brand);
+  --button-hover-background-color: var(--dicey-brand-hover);
+  --button-text-color: #fff;
+  --button-hover-text-color: #fff;
+  box-shadow: none;
+}
+.dicer-theme-browser .dicer-segmented button.dicey-tab.active .dicer-count {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.dicer-theme-browser .dicer-segmented button.dicey-tab .dicey-tab-icon {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 0;
+  flex: none;
+}
+
+/* Section headers in the Dicey tabs. */
+.dicer-theme-browser .dicey-section {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 2px 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--dicey-brand) 50%, transparent);
+  font-size: var(--font-size-11, 11px);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dicey-ink);
+}
+.dicer-theme-browser .dicey-section ~ .dicey-section {
+  margin-top: 6px;
+}
+
+/* ---- Settings window ---------------------------------------------------- */
+
+.dicey-settings {
+  --dicey-brand: #7000d6;
+  --dicey-brand-hover: #8f00ff;
+  --dicey-ink: color-mix(in srgb, var(--dicey-brand) 45%, var(--color-text-primary, #e8e2d6));
+  --dicey-line: color-mix(in srgb, var(--dicey-brand) 35%, transparent);
+  --dicey-scroll: color-mix(in srgb, color-mix(in srgb, var(--dicey-brand) 18%, var(--color-text-secondary, #9a98a4)) 55%, transparent);
+  --dicey-scroll-hover: color-mix(in srgb, color-mix(in srgb, var(--dicey-brand) 24%, var(--color-text-secondary, #9a98a4)) 80%, transparent);
+}
+.dicey-settings .window-content {
+  padding: 0;
+}
+.dicey-set-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.dicey-set-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--dicey-line);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--dicey-brand) 28%, transparent), transparent 70%);
+}
+.dicey-set-logo {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 7px;
+  box-shadow: 0 0 0 1px var(--dicey-brand-hover), 0 0 10px color-mix(in srgb, var(--dicey-brand-hover) 45%, transparent);
+  flex: none;
+}
+.dicey-set-search {
+  flex: 0 0 210px;
+  height: 30px;
+}
+.dicey-set-search:focus {
+  border-color: var(--dicey-brand-hover);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--dicey-brand-hover) 50%, transparent);
+  outline: none;
+}
+.dicey-set-note {
+  margin: 0;
+  font-size: var(--font-size-12, 12px);
+  color: var(--color-text-secondary);
+  line-height: 1.3;
+}
+.dicey-set-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.dicey-set-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 0 0 170px;
+  padding: 10px 8px;
+  border-right: 1px solid var(--dicey-line);
+}
+.dicey-set-tab {
+  justify-content: flex-start;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px;
+  text-align: left;
+  --button-background-color: transparent;
+  --button-border-color: transparent;
+}
+.dicey-set-tab i {
+  width: 16px;
+  text-align: center;
+  color: var(--dicey-ink);
+}
+.dicey-set-tab:hover {
+  --button-hover-background-color: color-mix(in srgb, var(--dicey-brand) 25%, transparent);
+  --button-hover-border-color: color-mix(in srgb, var(--dicey-brand) 60%, transparent);
+}
+.dicey-set-tab.active {
+  --button-background-color: var(--dicey-brand);
+  --button-border-color: var(--dicey-brand-hover);
+  --button-text-color: #fff;
+  --button-hover-background-color: var(--dicey-brand-hover);
+  --button-hover-text-color: #fff;
+  font-weight: 600;
+}
+.dicey-set-tab.active i {
+  color: #fff;
+}
+.dicey-set-panels {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 6px 14px 12px;
+  /* A thin, quiet scrollbar: a grey with a hint of the brand violet, well under the active tab and hover tints. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--dicey-scroll) transparent;
+}
+.dicey-set-panels:hover {
+  scrollbar-color: var(--dicey-scroll-hover) transparent;
+}
+.dicey-set-panel {
+  display: none;
+}
+.dicey-set-panel.active {
+  display: block;
+}
+.dicey-set-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--dicey-line);
+}
+.dicey-set-panel-head h3 {
+  margin: 0;
+  border: none;
+  font-size: var(--font-size-12, 12px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dicey-ink);
+}
+.dicey-set-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 14px;
+  align-items: center;
+  padding: 10px 2px 10px 10px;
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--dicey-brand) 18%, transparent);
+}
+.dicey-set-row:hover {
+  border-left-color: color-mix(in srgb, var(--dicey-brand) 70%, transparent);
+  background: color-mix(in srgb, var(--dicey-brand) 7%, transparent);
+}
+.dicey-set-row.is-locked {
+  opacity: 0.85;
+}
+.dicey-set-text strong {
+  font-size: var(--font-size-14, 14px);
+}
+.dicey-set-text p {
+  margin: 2px 0 0;
+  font-size: var(--font-size-12, 12px);
+  color: var(--color-text-secondary);
+}
+.dicey-set-text .dicey-set-lock {
+  color: var(--dicey-ink);
+}
+.dicey-set-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dicey-set-controls select {
+  min-width: 160px;
+}
+.dicey-set-policy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--font-size-10, 10px);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+.dicey-set-policy select {
+  min-width: 150px;
+  height: 26px;
+  font-size: var(--font-size-12, 12px);
+  text-transform: none;
+  letter-spacing: normal;
+}
+.dicey-set-policy.dicey-policy-default select {
+  border-color: color-mix(in srgb, var(--dicey-brand-hover) 70%, transparent);
+}
+.dicey-set-policy.dicey-policy-forced select {
+  border-color: var(--dicey-brand-hover);
+  background: color-mix(in srgb, var(--dicey-brand) 35%, transparent);
+  color: #fff;
+}
+
+/* On/off switch in brand purple. */
+.dicey-set-toggle {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  flex: none;
+}
+.dicey-set-toggle input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.dicey-set-slider {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-text-secondary, #888) 35%, transparent);
+  transition: background-color 120ms;
+}
+.dicey-set-slider::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #f2ecff;
+  transition: transform 120ms;
+}
+.dicey-set-toggle input:checked + .dicey-set-slider {
+  background: var(--dicey-brand);
+  box-shadow: 0 0 0 1px var(--dicey-brand-hover);
+}
+.dicey-set-toggle input:checked + .dicey-set-slider::after {
+  transform: translateX(18px);
+}
+.dicey-set-toggle input:disabled {
+  cursor: not-allowed;
+}
+.dicey-set-toggle input:focus-visible + .dicey-set-slider {
+  outline: 2px solid var(--dicey-brand-hover);
+  outline-offset: 2px;
+}
+
+/* Holiday picker: a grid of checkboxes. */
+.dicey-set-holidays {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 4px 10px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.dicey-set-holidays label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-13, 13px);
+}
+.dicey-set-holidays input {
+  --checkbox-checked-color: var(--dicey-brand-hover);
+  accent-color: var(--dicey-brand-hover);
+  margin: 0;
+}
+.dicey-set-holidays i {
+  width: 14px;
+  text-align: center;
+  color: var(--dicey-ink);
+}
+.dicey-set-holidays .is-in-season {
+  font-weight: 600;
+}
+.dicey-set-holidays .is-in-season::after {
+  content: "\f005";
+  font-family: var(--font-awesome, "Font Awesome 6 Pro");
+  font-weight: 900;
+  font-size: 10px;
+  color: var(--dicey-brand-hover);
+}
+
+/* Search shows matching rows from every tab. */
+.dicey-settings.dicey-searching .dicey-set-panel.has-match {
+  display: block;
+}
+.dicey-settings.dicey-searching .dicey-set-panel:not(.has-match) {
+  display: none;
+}
+.dicey-settings.dicey-searching .dicey-set-tab.active {
+  --button-background-color: transparent;
+  --button-text-color: var(--color-text-primary);
+  font-weight: normal;
+}
+.dicey-set-row[hidden] {
+  display: none;
+}
+
+/* A field changed since the window opened: a 3px inset brand bar and a small "(changed)" after the label. */
+.dicey-set-row.is-changed {
+  box-shadow: inset 3px 0 0 var(--dicey-brand);
+}
+.dicey-set-row.is-changed .dicey-set-text strong::after {
+  content: " (changed)";
+  font-size: 0.8em;
+  font-style: italic;
+  font-weight: normal;
+  color: var(--dicey-ink);
+}
+.dicey-set-row.is-elsewhere .dicey-set-text strong::before {
+  content: "\f021";
+  font-family: "Font Awesome 6 Pro", "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 0.75em;
+  margin-right: 4px;
+  color: var(--dicey-ink);
+}
+.dicey-set-reset-field {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  min-height: 0;
+  padding: 0;
+  line-height: 1;
+}
+.dicey-set-reset-field:disabled {
+  opacity: 0.35;
+}
+
+.dicey-set-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--dicey-line);
+}
+.dicey-set-footer button {
+  flex: none;
+  width: auto;
+  padding: 0 12px;
+}
+/* Dice themes sits on its own at the left, away from Reset and Save. */
+.dicey-set-footer .dicey-set-themes {
+  margin-right: auto;
+  --button-border-color: var(--dicey-brand-hover);
+  --button-hover-background-color: color-mix(in srgb, var(--dicey-brand) 30%, transparent);
+}
+
+/* ---- Damage type map dropdowns -------------------------------------------- */
+
+#dicer-damage-map-editor {
+  --dicey-brand: #7000d6;
+  --dicey-brand-hover: #8f00ff;
+}
+/* Our groups: purple header, a faint purple wash on their options. */
+#dicer-damage-map-editor optgroup[data-dicey] {
+  color: #c9a2ff;
+  font-weight: 700;
+  background: #241536;
+}
+#dicer-damage-map-editor optgroup[data-dicey] option {
+  color: var(--color-text-primary, #e8e2d6);
+  font-weight: 400;
+  background: #1d1628;
+}
+#dicer-damage-map-editor optgroup[data-dicey-dicer] {
+  font-weight: 700;
+}
+#dicer-damage-map-editor optgroup[data-dicey-dicer] option {
+  font-weight: 400;
+}
+/* A closed dropdown set to one of ours shows it with a purple edge. */
+#dicer-damage-map-editor select.dicey-chosen {
+  border-color: color-mix(in srgb, var(--dicey-brand-hover) 70%, transparent);
+  box-shadow: inset 3px 0 0 var(--dicey-brand-hover);
+}
+
+/* ---- Static cards: holidays not loaded yet, and Coming soon ---------------- */
+
+.dicer-theme-browser .dicey-static .dicer-stage {
+  background: radial-gradient(circle at 50% 40%, #2a2233 0%, #17141c 75%);
+}
+.dicer-theme-browser .dicey-static-art {
+  position: absolute;
+  inset: 18%;
+  width: 64%;
+  height: 64%;
+  border: none;
+  border-radius: 12%;
+  opacity: 0.55;
+  filter: saturate(0.7);
+  transition: opacity 120ms, filter 120ms;
+}
+.dicer-theme-browser .dicey-static:hover .dicey-static-art {
+  opacity: 0.85;
+  filter: none;
+}
+/* The holiday's own icon in a small purple disc, bottom right of the art. */
+.dicer-theme-browser .dicey-static-mark {
+  position: absolute;
+  right: 10%;
+  bottom: 10%;
+  display: grid;
+  place-items: center;
+  width: 28%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--dicey-brand);
+  box-shadow: 0 0 0 2px #17141c, 0 2px 6px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 15px;
+}
+.dicer-theme-browser .dicey-later.is-loading {
+  cursor: progress;
+  opacity: 0.6;
+}
+.dicer-theme-browser .dicey-soon {
+  cursor: default;
+  border-style: dashed;
+}
+.dicer-theme-browser .dicey-soon .dicey-static-art {
+  opacity: 0.4;
+  filter: grayscale(0.4);
+}
+
+/* Dicey settings button in Dicer's theme browser toolbar (icon only). */
+.dicer-theme-browser .dicer-toolbar-actions .dicey-open-settings {
+  padding: 0 6px;
+  --button-border-color: var(--dicey-brand-hover);
+  --button-background-color: color-mix(in srgb, var(--dicey-brand) 22%, transparent);
+  border-color: var(--dicey-brand-hover);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--dicey-brand-hover) 45%, transparent);
+}
+.dicer-theme-browser .dicer-toolbar-actions .dicey-open-settings img {
+  width: 18px;
+  height: 18px;
+  border: none;
+  vertical-align: middle;
+}
+.dicer-theme-browser .dicer-toolbar-actions .dicey-open-settings:hover {
+  --button-hover-border-color: var(--dicey-brand-hover);
+  --button-hover-background-color: color-mix(in srgb, var(--dicey-brand) 30%, transparent);
+}

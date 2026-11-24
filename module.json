@@ -2,7 +2,7 @@
   "id": "dicey",
   "title": "Things Got Dicey",
   "description": "An unofficial theme pack for Dicer: custom dice sets, textures, and roll effects.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "authors": [
     {
       "name": "David Outrider"
@@ -34,6 +34,19 @@
       "lang": "en",
       "name": "English",
       "path": "lang/en.json"
+    }
+  ],
+  "packs": [
+    {
+      "name": "dicey-macros",
+      "label": "Macros",
+      "path": "packs/dicey-macros",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     }
   ],
   "license": "GPL-3.0-or-later",

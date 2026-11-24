@@ -1,0 +1,5 @@
+2026/11/23-20:23:09.925023 7a95e5bfd6c0 Delete type=3 #1
+2026/11/23-20:23:09.929247 7a95e4bfb6c0 Level-0 table #5: started
+2026/11/23-20:23:09.934546 7a95e4bfb6c0 Level-0 table #5: 836 bytes OK
+2026/11/23-20:23:09.942057 7a95e4bfb6c0 Delete type=0 #3
+2026/11/23-20:23:09.942216 7a95e4bfb6c0 Manual compaction at level-0 from '!macros!dcyMacSettings01' @ 72057594037927935 : 1 .. '!macros!dcyMacThemes0001' @ 0 : 0; will stop at (end)

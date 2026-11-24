@@ -1,0 +1,15 @@
+{
+  "_id": "dcyMacThemes0001",
+  "name": "Dice Themes",
+  "type": "script",
+  "img": "modules/dicey/assets/icons/macro-dicer-themes.svg",
+  "scope": "global",
+  "command": "// Opens Dicer's Dice Themes window.\n// Part of Outrider's Outpost - 0utrider.github.io/outpost\nconst menu = game.modules.get(\"dicer\")?.active && game.settings.menus.get(\"dicer.themeBrowser\");\nif (menu) new menu.type().render({ force: true });\nelse ui.notifications.warn(\"Dicer is not active in this world.\");\n",
+  "folder": null,
+  "sort": 300000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!macros!dcyMacThemes0001"
+}

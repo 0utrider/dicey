@@ -6,7 +6,13 @@
  *
  * Add a feature: create features/<name>.js, import it here, append to FEATURES.
  */
+import * as settings from "./settings.js";
 import * as themes from "./themes.js";
 import * as damageMap from "./damage-map.js";
+import * as holidays from "./holidays.js";
+import * as holidayDice from "./holiday-dice.js";
+import * as holidayFx from "./holiday-fx.js";
+import * as welcome from "./welcome.js";
+import * as content from "./content.js";
 
-export const FEATURES = [themes, damageMap];
+export const FEATURES = [settings, themes, damageMap, holidays, holidayDice, holidayFx, welcome, content];
