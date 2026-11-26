@@ -26,7 +26,11 @@ export const SETTINGS = {
   holidayDice: { type: Boolean, default: true },
   holidayPick: { type: String, default: "random" },
   holidaySkip: { type: Array, default: [] },
-  holidayFx: { type: Boolean, default: true },
+  screenFx: { type: Boolean, default: true },
+  fxSound: { type: Boolean, default: true },
+  jingles: { type: Boolean, default: true },
+  ledDice: { type: Boolean, default: true },
+  quietPets: { type: Boolean, default: true },
   holidaysInAll: { type: Boolean, default: true },
   inSeasonFirst: { type: Boolean, default: true },
 };
@@ -46,7 +50,7 @@ export function lowQuality() {
 }
 
 /** Settings that start Off for a player on Low quality (their performance), until that player chooses. */
-const OFF_ON_LOW = new Set(["holidayFx"]);
+const OFF_ON_LOW = new Set(["ledDice"]);
 
 /** A setting's default for this client: the registered one, except where Low quality turns it Off. */
 export const defaultOf = (key) =>

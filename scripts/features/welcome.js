@@ -1,7 +1,7 @@
-import { DATA_ID } from "../constants.js";
+import { DATA_ID, PACKAGE_ID } from "../constants.js";
 import { HOLIDAYS, standing } from "../holiday-calendar.js";
 import { DiceySettings } from "../settings-app.js";
-import { effective, lowDefaultApplies, policyOf } from "../settings.js";
+import { effective, isLocked, policyOf, setOwn } from "../settings.js";
 
 /**
  * A player's first load in a world with Dicey on: a small popup saying what their settings are right
@@ -14,39 +14,82 @@ export const id = "welcome";
 const t = (key) => game.i18n.localize(key);
 const esc = (text) => foundry.utils.escapeHTML(String(text));
 
-/** "(set by your GM)" or "(your GM's default)" when the GM has a say in this value. */
-function whoSays(key) {
+/** A line under a control: "set by your GM" when locked, "your GM's default" when they gave one. */
+function who(key) {
+  if (isLocked(key)) return t("DICEY.Settings.LockedByGM");
   const mode = policyOf(key).mode;
-  return mode === "forced" ? ` ${t("DICEY.Welcome.GmSet")}` : mode === "default" ? ` ${t("DICEY.Welcome.GmDefault")}` : "";
+  return mode === "default" && !game.user.isGM ? t("DICEY.Welcome.GmDefault") : "";
 }
 
-const onOff = (on) => t(on ? "DICEY.Welcome.On" : "DICEY.Welcome.Off");
+function row(key, control) {
+  const note = who(key);
+  return `<div class="dicey-welcome-row">
+    <div class="dicey-welcome-text"><strong>${esc(t(`DICEY.Settings.${key}.Name`))}</strong>
+      <span>${esc(t(`DICEY.Settings.${key}.Hint`))}</span>${note ? `<em>${esc(note)}</em>` : ""}</div>${control}</div>`;
+}
+
+const toggle = (key, on) =>
+  `<label class="dicey-set-toggle"><input type="checkbox" name="${key}" ${on ? "checked" : ""} ${isLocked(key) ? "disabled" : ""}><span class="dicey-set-slider"></span></label>`;
 
 function content() {
   const dice = effective("holidayDice") === true;
-  const fx = effective("holidayFx") !== false;
+  const screen = effective("screenFx") !== false;
+  const sound = effective("fxSound") !== false;
+  const pick = effective("holidayPick");
   const skipped = new Set(effective("holidaySkip") ?? []);
   const now = HOLIDAYS.filter((h) => !skipped.has(h.id) && standing(h)?.inSeason).map((h) => t(h.label));
-  const rows = [
-    [t("DICEY.Settings.holidayDice.Name"), `${onOff(dice)}${whoSays("holidayDice")}`],
-    ...(dice ? [[t("DICEY.Settings.holidayPick.Name"), `${t(`DICEY.Settings.holidayPick.${effective("holidayPick")}`)}${whoSays("holidayPick")}`]] : []),
-    [t("DICEY.Settings.holidayFx.Name"), `${onOff(fx)}${lowDefaultApplies("holidayFx") ? "" : whoSays("holidayFx")}`],
-  ];
-  const list = rows.map(([name, value]) => `<li><strong>${esc(name)}:</strong> ${esc(value)}</li>`).join("");
   const season = now.length ? game.i18n.format("DICEY.Welcome.InSeason", { list: now.join(", ") }) : t("DICEY.Welcome.NoneInSeason");
-  // Off for a Low-quality player by default (even over a GM default): say why, so nobody wonders where the effects are.
-  const low = lowDefaultApplies("holidayFx") ? `<p class="notes">${esc(t("DICEY.Welcome.FxLow"))}</p>` : "";
-  return `<p>${esc(t("DICEY.Welcome.Intro"))}</p><ul>${list}</ul><p>${esc(season)}</p>${low}`;
+  const select = `<select name="holidayPick" ${isLocked("holidayPick") ? "disabled" : ""}>${["random", "featured"]
+    .map((v) => `<option value="${v}" ${pick === v ? "selected" : ""}>${esc(t(`DICEY.Settings.holidayPick.${v}`))}</option>`)
+    .join("")}</select>`;
+  return `<div class="dicey-welcome-body">
+    <header class="dicey-welcome-hero">
+      <img src="modules/${PACKAGE_ID}/assets/icons/dicey-64.webp" alt="">
+      <div><h2>${esc(t("DICEY.Welcome.Title"))}</h2><p>${esc(t("DICEY.Welcome.Intro"))}</p></div>
+    </header>
+    <p class="dicey-welcome-season"><i class="fa-solid fa-gift"></i> ${esc(season)}</p>
+    <div class="dicey-welcome-rows">
+      ${row("holidayDice", toggle("holidayDice", dice))}
+      ${row("holidayPick", select)}
+      ${row("screenFx", toggle("screenFx", screen))}
+      ${row("fxSound", toggle("fxSound", sound))}
+    </div>
+    <p class="dicey-welcome-foot">${esc(t("DICEY.Welcome.Foot"))}</p>
+  </div>`;
+}
+
+/** Controls here save as they change, as a player's own choice (same as Save in the settings window). */
+function wire(dialog) {
+  const root = dialog.element;
+  const sync = () => {
+    const dice = root.querySelector('[name="holidayDice"]')?.checked;
+    root.querySelector('[name="holidayPick"]')?.closest(".dicey-welcome-row")?.classList.toggle("dimmed", !dice);
+  };
+  sync();
+  root.addEventListener("change", async (event) => {
+    const input = event.target;
+    const key = input?.name;
+    if (!key || input.disabled) return;
+    const value = input.type === "checkbox" ? input.checked : input.value;
+    try {
+      await setOwn(key, value);
+    } catch (err) {
+      console.warn(`${DATA_ID} | welcome popup could not save ${key}`, err);
+    }
+    sync();
+  });
 }
 
 export async function show() {
   const action = await foundry.applications.api.DialogV2.wait({
-    window: { title: "DICEY.Welcome.Title", icon: "fa-solid fa-bomb" },
-    position: { width: 420 },
+    classes: ["dicey-welcome"],
+    window: { title: "DICEY.Welcome.Title", icon: "fa-solid fa-dice-d20" },
+    position: { width: 460 },
     content: content(),
+    render: (event, dialog) => wire(dialog),
     buttons: [
-      { action: "open", label: t("DICEY.Welcome.Open"), icon: "fa-solid fa-sliders", default: true },
-      { action: "close", label: t("DICEY.Welcome.Close"), icon: "fa-solid fa-xmark" },
+      { action: "open", label: t("DICEY.Welcome.Open"), icon: "fa-solid fa-sliders" },
+      { action: "close", label: t("DICEY.Welcome.Close"), icon: "fa-solid fa-check", default: true },
     ],
     rejectClose: false,
   });

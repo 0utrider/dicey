@@ -1,0 +1,243 @@
+/* Dicey screen effects (scripts/screen-fx.js). Drawn over the board, under Foundry's windows. */
+.dicey-screen-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  animation: dicey-sfx-life var(--ms, 4000ms) ease-in-out both;
+}
+.dicey-screen-fx svg { display: block; overflow: visible; }
+
+@keyframes dicey-sfx-life {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---- light string ---- */
+.dicey-wire path { fill: none; stroke: #24452c; stroke-width: 3; stroke-linecap: round; }
+.dicey-garland, .dicey-holly { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45)); }
+.dicey-bulb { --c: #fff; }
+.dicey-bulb .dicey-glass { filter: drop-shadow(0 0 7px var(--c)) drop-shadow(0 0 16px var(--c)); }
+.dicey-bulb.dicey-lit { animation: dicey-chase 0.9s ease-in-out infinite; animation-delay: var(--d); }
+.dicey-bulb.dicey-p1 { animation-duration: 1.1s; }
+.dicey-bulb.dicey-p2 { animation-duration: 0.7s; }
+.dicey-bulb.dicey-flicker { animation: dicey-flicker 0.55s steps(1, end) infinite; animation-delay: var(--d); }
+.dicey-bulb.dicey-dead .dicey-glass { fill: #3b3b34; filter: none; }
+.dicey-bulb.dicey-dead ellipse:nth-of-type(2) { opacity: 0.15; }
+
+
+@keyframes dicey-chase {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.28; }
+}
+@keyframes dicey-flicker {
+  0% { opacity: 1; }
+  12% { opacity: 0.1; }
+  20% { opacity: 0.9; }
+  41% { opacity: 0.05; }
+  47% { opacity: 0.7; }
+  80% { opacity: 0.15; }
+}
+
+/* ---- candles ---- */
+.dicey-flame { transform-box: fill-box; transform-origin: 50% 100%; }
+.dicey-flame .dicey-tongue {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: dicey-ignite 0.5s ease-out both, dicey-flicker-flame 0.38s ease-in-out infinite alternate;
+  animation-delay: var(--delay), calc(var(--delay) + 0.5s);
+  transform: scale(0);
+}
+.dicey-flame .dicey-halo {
+  opacity: 0;
+  animation: dicey-halo-in 0.6s ease-out both;
+  animation-delay: var(--delay);
+}
+.dicey-flame.dicey-out .dicey-tongue {
+  transform: scale(1);
+  animation: dicey-flicker-flame 0.38s ease-in-out infinite alternate, dicey-gutter 0.45s ease-in both;
+  animation-delay: 0s, var(--delay);
+}
+.dicey-flame.dicey-out .dicey-halo {
+  opacity: 1;
+  animation: dicey-halo-out 0.45s ease-in both;
+  animation-delay: var(--delay);
+}
+.dicey-flame .dicey-halo { mix-blend-mode: screen; }
+.dicey-smoke {
+  stroke: rgba(205, 205, 212, 0.5);
+  stroke-width: 3;
+  filter: blur(1.4px);
+  stroke-linecap: round;
+  stroke-dasharray: 140;
+  stroke-dashoffset: 140;
+  opacity: 0;
+  animation: dicey-wisp 1.5s ease-out both;
+  animation-delay: calc(var(--delay) + 0.3s);
+}
+.dicey-smoke.thin { stroke-width: 1.6; stroke: rgba(215, 215, 222, 0.4); animation-delay: calc(var(--delay) + 0.4s); }
+@keyframes dicey-ignite { from { transform: scale(0); } to { transform: scale(1); } }
+@keyframes dicey-flicker-flame {
+  from { transform: scale(1, 1) skewX(-3deg); }
+  to { transform: scale(0.92, 1.12) skewX(4deg); }
+}
+@keyframes dicey-gutter { from { transform: scale(1); } 60% { transform: scale(0.5, 0.2); } to { transform: scale(0); } }
+@keyframes dicey-halo-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dicey-halo-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes dicey-wisp {
+  0% { stroke-dashoffset: 140; opacity: 0.9; }
+  100% { stroke-dashoffset: 0; opacity: 0; transform: translateY(-24px); }
+}
+
+/* ---- sparks at snapped wires ---- */
+.dicey-spark {
+  fill: none;
+  stroke: #ffe680;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 7 60;
+  stroke-dashoffset: 7;
+  opacity: 0;
+  filter: drop-shadow(0 0 3px #ffb020);
+  animation: dicey-spark 0.7s ease-out infinite;
+  animation-delay: var(--sd, 0s);
+}
+.dicey-spark-core {
+  opacity: 0;
+  filter: drop-shadow(0 0 6px #ffd040);
+  animation: dicey-spark-core 0.7s ease-out infinite;
+  animation-delay: var(--sd, 0s);
+}
+@keyframes dicey-spark {
+  0% { stroke-dashoffset: 7; opacity: 1; }
+  45% { opacity: 1; }
+  70%, 100% { stroke-dashoffset: -40; opacity: 0; }
+}
+@keyframes dicey-spark-core {
+  0% { opacity: 1; }
+  25% { opacity: 0.6; }
+  40%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dicey-bulb.dicey-lit, .dicey-bulb.dicey-flicker { animation: none; }
+  .dicey-spark, .dicey-spark-core { animation: none; opacity: 0.8; stroke-dashoffset: 0; }
+  .dicey-flame .dicey-tongue { animation: dicey-ignite 0.01s both; animation-delay: var(--delay); }
+}
+
+/* ---- falling things: leaves, snow, coins ---- */
+.dicey-fall {
+  opacity: 0;
+  animation: dicey-fall var(--dur, 3s) linear both;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes dicey-fall {
+  0% { transform: translate(0, 0) rotate(0); opacity: 0; }
+  6% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { transform: translate(var(--drift), var(--fall)) rotate(var(--spin)); opacity: 0; }
+}
+.dicey-sway { animation: dicey-sway-leaf var(--s, 1.2s) ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 50%; }
+@keyframes dicey-sway-leaf { from { transform: translateX(-22px) rotate(-18deg); } to { transform: translateX(22px) rotate(18deg); } }
+.dicey-flake { filter: drop-shadow(0 0 3px rgba(190, 225, 255, 0.9)); }
+.dicey-flip { animation: dicey-coin-flip var(--f, 0.6s) linear infinite; transform-box: fill-box; transform-origin: 50% 50%; }
+.dicey-gelt-shade { opacity: 0; animation: dicey-gelt-shade var(--f, 0.6s) linear infinite; }
+@keyframes dicey-gelt-shade { 0%, 100% { opacity: 0; } 50% { opacity: 0.45; } }
+.dicey-glint { opacity: 0; transform-box: fill-box; animation: dicey-glint 1.1s ease-in-out var(--g, 0s) infinite; }
+@keyframes dicey-glint { 0%, 100% { opacity: 0; } 45% { opacity: 0.95; } 60% { opacity: 0; } }
+@keyframes dicey-coin-flip { 0% { transform: scaleX(1); } 50% { transform: scaleX(0.12); } 100% { transform: scaleX(1); } }
+
+/* ---- splat ---- */
+.dicey-splat-body {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: dicey-smack 0.28s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  animation-delay: var(--delay, 0s);
+  opacity: 0;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.45));
+}
+@keyframes dicey-smack {
+  0% { transform: scale(0.2); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.dicey-drip {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+  animation: dicey-drip var(--ms, 2.6s) cubic-bezier(0.3, 0.1, 0.5, 1) both;
+  animation-delay: var(--delay, 0.3s);
+}
+@keyframes dicey-drip { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+/* ---- dreidel ---- */
+.dicey-dd-face {
+  font: 700 54px "Arial Hebrew", "Segoe UI", "Noto Sans Hebrew", sans-serif;
+  fill: #ffd75e;
+  stroke: #5a3d05;
+  stroke-width: 1.2px;
+  paint-order: stroke;
+}
+/* a growing wobble on its point as it slows (the spin itself is drawn frame by frame) */
+.dicey-dd-wobble {
+  transform-box: view-box;
+  transform-origin: 0 98px;
+  animation: dicey-dd-wobble 1.9s ease-in both;
+}
+@keyframes dicey-dd-wobble {
+  0% { transform: rotate(0); }
+  30% { transform: rotate(1.5deg); }
+  50% { transform: rotate(-3deg); }
+  68% { transform: rotate(5deg); }
+  84% { transform: rotate(-8deg); }
+  100% { transform: rotate(10deg); }
+}
+.dicey-dd-topple {
+  transform-box: view-box;
+  transform-origin: 0 98px;
+  animation: dicey-dd-topple 0.8s cubic-bezier(0.5, 0, 0.9, 0.6) 1.85s both;
+}
+@keyframes dicey-dd-topple {
+  0% { transform: rotate(0); }
+  80% { transform: rotate(78deg) translate(0, 4px); }
+  90% { transform: rotate(72deg) translate(0, 4px); }
+  100% { transform: rotate(76deg) translate(0, 6px); }
+}
+.dicey-dd-shadow { animation: dicey-dd-shadow 2.6s ease-in both; transform-box: fill-box; transform-origin: 50% 50%; }
+@keyframes dicey-dd-shadow { 0% { transform: scaleX(0.5); } 70% { transform: scaleX(0.7); } 100% { transform: scaleX(1.5); } }
+.dicey-dd-spill {
+  opacity: 0;
+  animation: dicey-dd-spill 1.3s cubic-bezier(0.3, 0, 0.7, 1) var(--sd, 2.4s) both;
+}
+@keyframes dicey-dd-spill {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 0; }
+  12% { opacity: 1; }
+  45% { transform: translate(calc(var(--dx) * 0.55), calc(var(--dy) * -1)) scale(1); }
+  85% { opacity: 1; }
+  100% { transform: translate(var(--dx), 70px) scale(1); opacity: 0; }
+}
+.dicey-dd-dust {
+  opacity: 0;
+  animation: dicey-dd-dust 1.2s ease-out 2.45s both;
+}
+@keyframes dicey-dd-dust {
+  0% { transform: translate(0, 0) scale(0.3); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(1.6); opacity: 0; }
+}
+.dicey-dd-letter {
+  font: 700 120px "Arial Hebrew", "Segoe UI", "Noto Sans Hebrew", sans-serif;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  opacity: 0;
+  animation: dicey-letter-pop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) 2.45s both;
+}
+.dicey-dd-letter.win { fill: #ffe08a; stroke: #7a5210; stroke-width: 2px; paint-order: stroke; filter: drop-shadow(0 0 16px rgba(255, 214, 110, 0.95)); }
+.dicey-dd-letter.lose { fill: #b9c2d3; stroke: #3a4458; stroke-width: 2px; paint-order: stroke; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6)); }
+@keyframes dicey-letter-pop { from { transform: scale(0.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dicey-sway, .dicey-flip, .dicey-gelt-shade, .dicey-glint, .dicey-dd-wobble { animation: none; }
+}

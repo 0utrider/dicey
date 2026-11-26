@@ -1,0 +1,15 @@
+{
+  "_id": "dcyMacFxTest0001",
+  "name": "Dicey Effects Test",
+  "type": "script",
+  "img": "modules/dicey/assets/icons/dicey-mark-64.webp",
+  "scope": "global",
+  "command": "// Opens the Things Got Dicey effects test (GM only): try the holiday effects with real rolls.\n// Part of Outrider's Outpost - 0utrider.github.io/outpost\nconst id = [\"dicey\", \"dicey-dev\"].find((m) => game.modules.get(m)?.active);\nconst open = id && game.modules.get(id).api?.effectsTest;\nif (open) open();\nelse ui.notifications.warn(\"Things Got Dicey is not active in this world.\");\n",
+  "folder": null,
+  "sort": 400000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_key": "!macros!dcyMacFxTest0001"
+}

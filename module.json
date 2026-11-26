@@ -2,7 +2,7 @@
   "id": "dicey",
   "title": "Things Got Dicey",
   "description": "An unofficial theme pack for Dicer: custom dice sets, textures, and roll effects.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "authors": [
     {
       "name": "David Outrider"
@@ -27,7 +27,8 @@
     "scripts/main.js"
   ],
   "styles": [
-    "styles/main.css"
+    "styles/main.css",
+    "styles/screen-fx.css"
   ],
   "languages": [
     {

@@ -19,7 +19,7 @@ Paste this manifest URL into **Add-on Modules → Install Module**:
 https://github.com/0utrider/dicey/releases/latest/download/module.json
 ```
 
-## What's in 0.1.0 (alpha)
+## Damage type sets
 
 A set of 14 damage type dice themes plus Starry Night, built for readable numbers (every theme uses the blackletter font, including over animated interiors): acid, bleed, cold, electricity, fire, force, mental, physical, poison, precision, sonic, spirit, vitality, void.
 
@@ -55,11 +55,14 @@ Seasons (some overlap on purpose):
 | Veterans Day | Nov 4 to Nov 18 |
 | Thanksgiving | two weeks before, through the Sunday after |
 | Christmas | the day after Thanksgiving to Dec 26 |
+| Hanukkah | six days before the first candle through the eighth day (from the Hebrew calendar) |
 | Winter Solstice | Dec 14 to Dec 28 |
 
 Dates follow the computer's own calendar. To see the browser as it would look on another day, run `game.modules.get("dicey").api.holidays.preview("2026-12-20")` in the console. `preview()` goes back to today.
 
-With [Sequencer](https://foundryvtt.com/packages/sequencer) and a JB2A module active, holiday sets can also play a scene effect when their roll finishes (on by default, but off for players whose dice quality is Low, even when the GM's default is On, since the animations can slow weaker systems; a player's own choice always wins, and a GM can set a default but cannot lock them on or off): fireworks on a natural 20 with Candy Cane, falling leaves with Turkey n Gravy, snow with Silent Night. It plays on the roller's token, or mid-screen when there is none. Turn it off with **Holiday scene effects** in the settings.
+On a natural 20 the Christmas sets play a short carol on bells, picked at random from Jingle Bells, Hark! the Herald Angels Sing, Joy to the World, Deck the Halls, Carol of the Bells, We Wish You a Merry Christmas, O Come All Ye Faithful, Angels We Have Heard on High, sleigh bells and ice chimes (everyone at the table hears the same one). Sugar Plum plays the Dance of the Sugar Plum Fairy, Up on the Housetop its own carol, and Silent Night its own music box. Each player can turn them off with the **Jingles** switch on the **Effects** tab; everyone else still hears theirs.
+
+Dicey also draws a few effects of its own, with no extra modules: a pine garland with holly and blinking Christmas lights around the screen on a natural 20 (every Christmas set but Silent Night, which gets snow); the same garland after Krampus got to it, torn and trodden, with dead bulbs and sparking wires, on a natural 1 (every Christmas set but Gingerbread, which crunches); and a menorah holding the candles for that night of Hanukkah (all eight outside Hanukkah), lit one by one on a natural 20 (the shamash first, then left to right), that go out in wisps of smoke on a natural 1 (Menorah). Tinsel and Lights also gets small LEDs blinking inside the dice (Dicer leaves them off on its lowest quality tier, and older Dicer shows the dice without them). Each has its own switch on the **Effects** tab of Dicey settings: **Screen effects**, **Effect sounds** (keeps the pictures, drops the sound), **Jingles** and **Blinking LEDs in dice** (off by default on Low dice quality; takes effect after a reload). A GM can set a default for these but cannot lock them. Thanksgiving and Hanukkah get their own too: leaves drifting down, gravy, cranberry and jelly splatting on the screen and dripping, foil-wrapped gold and silver gelt raining, a four-sided dreidel that spins on its point and falls to show gimel (spilling gelt) or nun, and snow. Many sets also have their own sounds (a wet splat for the gravy, a squelch for the gravy and cranberry, a soft thud for the doughnut and pie, a marimba "dreidel, dreidel, dreidel" on a natural 20, coins, chimes, a music box); those are rule sounds from Dicer and are not controlled by the **Effect sounds** switch. The sounds are synthesised for Dicey, so there is nothing to license.
 
 ## Settings
 
@@ -67,10 +70,11 @@ With [Sequencer](https://foundryvtt.com/packages/sequencer) and a JB2A module ac
 
 ## Macros
 
-Dicey adds two macros, in a **Macros** compendium and copied into your world's Macros tab, in the **Outrider's Mods** folder (the shared folder for Outrider's Outpost modules). The first GM to load a new version copies them in, and every player can see them (Observer). Drag one to the hotbar.
+Dicey adds three macros, in a **Macros** compendium and copied into your world's Macros tab, in the **Outrider's Mods** folder (the shared folder for Outrider's Outpost modules). The first GM to load a new version copies them in, and every player can see them (Observer). Drag one to the hotbar.
 
 - **Dicey Settings** opens the Dicey settings window.
 - **Dice Themes** opens Dicer's Dice Themes window.
+- **Dicey Effects Test** (GMs) opens a window for trying the holiday effects. A full roll rolls a d20 fixed to a natural 20, a natural 1 or anything between, with one of the holiday's sets, so the dice, their sounds, the screen effects and the jingles all play as in a game; your own dice set comes back after the roll. The rolls go to chat for you only unless you tick **Everyone sees the rolls**. The window sits under the dice, so the rolls land on top of it.
 
 They are script macros, so Foundry's *Use Script Macros* permission decides who can run them (Trusted Player and above by default). The d20 icon is a [Font Awesome Free](https://fontawesome.com/license/free) icon by Fonticons, Inc. (CC BY 4.0), with the fill colour changed.
 

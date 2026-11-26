@@ -28,7 +28,8 @@ export class DiceySettings extends HandlebarsApplicationMixin(ApplicationV2) {
     position: { width: 1040, height: 680 },
     form: { handler: DiceySettings.#onSubmit, closeOnSubmit: false, submitOnChange: false },
     actions: {
-      tab: DiceySettings.#onTab,
+      // not "tab": that name is Foundry's own tab action, which takes the click first
+      diceyTab: DiceySettings.#onTab,
       reset: DiceySettings.#onReset,
       resetAll: DiceySettings.#onResetAll,
       openThemes: DiceySettings.#onOpenThemes,

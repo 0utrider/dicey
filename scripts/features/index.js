@@ -14,5 +14,6 @@ import * as holidayDice from "./holiday-dice.js";
 import * as holidayFx from "./holiday-fx.js";
 import * as welcome from "./welcome.js";
 import * as content from "./content.js";
+import * as effectsTest from "./effects-test.js";
 
-export const FEATURES = [settings, themes, damageMap, holidays, holidayDice, holidayFx, welcome, content];
+export const FEATURES = [settings, themes, damageMap, holidays, holidayDice, holidayFx, welcome, content, effectsTest];

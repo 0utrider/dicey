@@ -533,3 +533,164 @@
   --button-hover-border-color: var(--dicey-brand-hover);
   --button-hover-background-color: color-mix(in srgb, var(--dicey-brand) 30%, transparent);
 }
+
+/* ---- First-load welcome popup (features/welcome.js) ---- */
+.dicey-welcome {
+  --dicey-brand: #7000d6;
+  --dicey-brand-hover: #8f00ff;
+  --dicey-ink: color-mix(in srgb, var(--dicey-brand) 45%, var(--color-text-primary, #e8e2d6));
+  --dicey-wl-bg: #14091f;
+  border: 1px solid color-mix(in srgb, var(--dicey-brand) 70%, transparent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--dicey-brand) 45%, transparent), 0 8px 30px rgba(0, 0, 0, 0.6);
+  background: var(--dicey-wl-bg);
+}
+.dicey-welcome .window-header {
+  background: linear-gradient(90deg, var(--dicey-brand), color-mix(in srgb, var(--dicey-brand) 60%, #1a0033));
+  border-bottom: 1px solid var(--dicey-brand-hover);
+  color: #fff;
+  --color-text-primary: #fff;
+}
+.dicey-welcome .window-content { background: transparent; padding: 0; }
+.dicey-welcome .dialog-content { padding: 0; }
+.dicey-welcome-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background:
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--dicey-brand-hover) 38%, transparent), transparent 65%),
+    color-mix(in srgb, var(--dicey-brand) 22%, var(--dicey-wl-bg));
+  border-bottom: 1px solid color-mix(in srgb, var(--dicey-brand) 55%, transparent);
+}
+.dicey-welcome-hero img { width: 56px; height: 56px; flex: none; filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--dicey-brand-hover) 70%, transparent)); }
+.dicey-welcome-hero h2 { margin: 0 0 2px; border: 0; font-size: 1.35rem; color: #fff; }
+.dicey-welcome-hero p { margin: 0; color: #d9c8f2; font-size: 0.9rem; }
+.dicey-welcome-season { margin: 12px 18px 4px; color: var(--dicey-ink); font-size: 0.9rem; }
+.dicey-welcome-season i { margin-right: 4px; color: var(--dicey-brand-hover); }
+.dicey-welcome-rows { display: flex; flex-direction: column; gap: 2px; padding: 6px 12px; }
+.dicey-welcome-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 8px;
+  border-radius: 6px;
+  color: #e8e0f5;
+}
+.dicey-welcome-row:hover { background: color-mix(in srgb, var(--dicey-brand) 14%, transparent); }
+.dicey-welcome-row.dimmed { opacity: 0.45; }
+.dicey-welcome-text { display: flex; flex-direction: column; gap: 1px; }
+.dicey-welcome-text span { font-size: 0.8rem; color: #b9a8d6; }
+.dicey-welcome-text em { font-size: 0.78rem; color: var(--dicey-brand-hover); font-style: normal; }
+.dicey-welcome-row select { flex: none; width: 170px; }
+.dicey-welcome-foot { margin: 4px 18px 14px; font-size: 0.78rem; color: #8f7fae; }
+.dicey-welcome .form-footer { padding: 10px 14px 14px; border-top: 1px solid color-mix(in srgb, var(--dicey-brand) 35%, transparent); }
+.dicey-welcome .form-footer button { --button-background-color: color-mix(in srgb, var(--dicey-brand) 25%, transparent); --button-text-color: #fff; --button-border-color: color-mix(in srgb, var(--dicey-brand) 70%, transparent); --button-hover-background-color: var(--dicey-brand); }
+.dicey-welcome .form-footer button[data-action="close"] { --button-background-color: var(--dicey-brand); --button-hover-background-color: var(--dicey-brand-hover); }
+
+/* ---- effects test (features/effects-test.js); takes the brand colours from .dicey-settings ---- */
+.dicey-test .window-content {
+  padding: 0;
+}
+/* under Dicer's dice (#dicer-canvas, z-index 60) so test rolls land on top of the panel; Foundry sets a
+   window's z-index inline when it comes to the front, hence !important */
+.application.dicey-test {
+  z-index: 59 !important;
+}
+.dicey-test-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.dicey-test-title {
+  font-size: var(--font-size-16, 16px);
+  font-weight: 700;
+  color: var(--dicey-ink);
+}
+.dicey-test-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--dicey-line);
+}
+.dicey-test-chip {
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: var(--font-size-11, 11px);
+  border: 1px solid var(--dicey-line);
+}
+.dicey-test-chip.on {
+  background: color-mix(in srgb, var(--dicey-brand) 30%, transparent);
+}
+.dicey-test-chip.off {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+.dicey-test-everyone {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-size: var(--font-size-12, 12px);
+}
+.dicey-test-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 12px 12px;
+  scrollbar-color: var(--dicey-scroll) transparent;
+}
+.dicey-test-body h3 {
+  font-size: var(--font-size-16, 16px);
+  margin: 12px 0 2px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--dicey-line);
+  color: var(--dicey-ink);
+}
+.dicey-test-group h4 {
+  margin: 8px 0 4px;
+  font-size: var(--font-size-13, 13px);
+}
+.dicey-test-group h4 i {
+  color: var(--dicey-brand-hover);
+  width: 1.2em;
+}
+.dicey-test-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.dicey-test .dicey-test-btn {
+  flex: none;
+  width: auto;
+  min-height: 26px;
+  padding: 2px 10px;
+  --button-border-color: color-mix(in srgb, var(--dicey-brand) 60%, transparent);
+  --button-background-color: color-mix(in srgb, var(--dicey-brand) 18%, transparent);
+  --button-hover-background-color: var(--dicey-brand);
+  --button-hover-text-color: #fff;
+}
+.dicey-test .dicey-test-btn small {
+  opacity: 0.75;
+  margin-left: 4px;
+}
+.dicey-test .dicey-test-btn.small {
+  min-height: 22px;
+  padding: 0 8px;
+  font-size: var(--font-size-12, 12px);
+}
+.dicey-test-set {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 0;
+}
+.dicey-test-set > span {
+  flex: 1;
+}
+.dicey-test.busy [data-action="fullRoll"],
+.dicey-test.busy [data-action="setRoll"] {
+  opacity: 0.45;
+  pointer-events: none;
+}

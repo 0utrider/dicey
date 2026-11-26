@@ -1,6 +1,6 @@
 /**
- * Dicey's settings as a declaration of the shared Outrider panel schema (schema 1, with the
- * `policy` flag and the `checklist` type proposed in om-outpost's HANDOFF-panel-dicey-policy-and-checklist).
+ * Dicey's settings as a declaration of the shared Outrider panel schema (schema 1, with a
+ * `policy` flag and a `checklist` type).
  * `policy` is `true` (free, default or forced) or a list of the modes the GM may pick. Plain data: the window (settings-app.js) draws it, and Outpost can host it as is. Labels and
  * hints are i18n keys; defaults and scope come from the registration (settings.js), not from here.
  */
@@ -30,8 +30,18 @@ export const declaration = {
             field("holidayDice", "switch"),
             field("holidayPick", "select", { options: [["featured", L("holidayPick.featured")], ["random", L("holidayPick.random")]] }),
             field("holidaySkip", "checklist", { store: "unchecked", optionsFn: holidayOptions }),
-            field("holidayFx", "switch", { policy: ["free", "default"] }),
           ],
+        },
+      ],
+    },
+    {
+      // Effects cost frames and make noise: a GM can set a default, never lock a player into them.
+      id: "effects",
+      label: L("Tab.effects"),
+      icon: "fa-solid fa-wand-magic-sparkles",
+      groups: [
+        {
+          fields: ["screenFx", "fxSound", "jingles", "quietPets", "ledDice"].map((key) => field(key, "switch", { policy: ["free", "default"] })),
         },
       ],
     },

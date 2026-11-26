@@ -55,6 +55,54 @@ function lunarNewYearWindow(y) {
 }
 
 /**
+ * Hanukkah: eight days from 25 Kislev (the first candle is lit the evening before). The Hebrew
+ * calendar comes from the runtime's own Intl data. Returns the Gregorian date of 25 Kislev in
+ * year `y`, or null when the runtime has no Hebrew calendar.
+ */
+const hebrewParts = (() => {
+  try {
+    return new Intl.DateTimeFormat("en-u-ca-hebrew", { month: "long", day: "numeric" });
+  } catch {
+    return null;
+  }
+})();
+
+export function hanukkahStart(y) {
+  if (!hebrewParts) return null;
+  for (let day = d(y, 11, 20); day.getFullYear() === y; day = addDays(day, 1)) {
+    const parts = hebrewParts.formatToParts(day);
+    const get = (type) => parts.find((p) => p.type === type)?.value;
+    if (get("month") === "Kislev" && get("day") === "25") return day;
+  }
+  return null;
+}
+
+/**
+ * Which night of Hanukkah `now` falls on (1 to 8), by date: the candles lit on that day's evening.
+ * The first candle is lit on the eve of 25 Kislev; the eighth day itself counts as 8. Null outside
+ * Hanukkah or when the runtime has no Hebrew calendar.
+ */
+export function hanukkahNight(now = new Date()) {
+  const today = d(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  // Hanukkah can run into January, so try last year's as well
+  for (const y of [today.getFullYear(), today.getFullYear() - 1]) {
+    const start = hanukkahStart(y);
+    if (!start) continue;
+    const days = Math.round((today - addDays(start, -1)) / 86_400_000);
+    if (days >= 0 && days <= 8) return Math.min(days + 1, 8);
+  }
+  return null;
+}
+
+function hanukkahWindow(y) {
+  const start = hanukkahStart(y);
+  // No Hebrew calendar in this runtime: all of December.
+  if (!start) return [d(y, 12, 1), d(y, 12, 31)];
+  // Five days of lead-in, through the eighth day.
+  return [addDays(start, -6), addDays(start, 7)];
+}
+
+/**
  * The calendar, in year order. `icon` is a Font Awesome class for the card badge. `label` is an
  * i18n key.
  */
@@ -90,6 +138,8 @@ export const HOLIDAYS = [
   // From the day after Thanksgiving, so the two share the long weekend.
   { id: "christmas", label: "DICEY.Holiday.christmas", icon: "fa-solid fa-tree",
     window: (y) => [addDays(thanksgiving(y), 1), d(y, 12, 26)] },
+  { id: "hanukkah", label: "DICEY.Holiday.hanukkah", icon: "fa-solid fa-menorah",
+    window: hanukkahWindow },
   { id: "winter-solstice", label: "DICEY.Holiday.winter-solstice", icon: "fa-solid fa-snowflake",
     window: (y) => [d(y, 12, 14), d(y, 12, 28)] },
 ];
