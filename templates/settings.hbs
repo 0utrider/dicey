@@ -54,8 +54,14 @@
     </div>
   </div>
   <footer class="dicey-set-footer">
-    <button type="button" class="dicey-set-themes" data-action="openThemes" data-tooltip="DICEY.Settings.OpenThemesHint"><i class="fa-solid fa-dice-d20"></i> {{localize "DICEY.Settings.OpenThemes"}}</button>
-    <button type="button" data-action="resetAll" data-tooltip="DICEY.Settings.ResetAllHint"><i class="fa-solid fa-arrow-rotate-left"></i> {{localize "DICEY.Settings.ResetAll"}}</button>
-    <button type="submit" class="bright"><i class="fa-solid fa-floppy-disk"></i> {{localize "DICEY.Settings.Save"}}</button>
+    <div class="dicey-set-links">
+      <button type="button" class="dicey-set-link" data-action="openThemes" data-tooltip="DICEY.Settings.OpenThemesHint"><i class="fa-solid fa-dice-d20"></i> {{localize "DICEY.Settings.OpenThemes"}}</button>
+      {{#if isGM}}<button type="button" class="dicey-set-link" data-action="openTest" data-tooltip="DICEY.Settings.OpenTestHint"><i class="fa-solid fa-wand-magic-sparkles"></i> {{localize "DICEY.Settings.OpenTest"}}</button>{{/if}}
+      <button type="button" class="dicey-set-link" data-action="openOutpost" data-tooltip="DICEY.Settings.OpenOutpostHint"><img src="{{outpostIcon}}" alt=""> {{localize "DICEY.Settings.OpenOutpost"}}</button>
+    </div>
+    <div class="dicey-set-actions">
+      <button type="button" class="dicey-set-reset-all" data-action="resetAll" data-tooltip="DICEY.Settings.ResetAllHint"><i class="fa-solid fa-arrow-rotate-left"></i> {{localize "DICEY.Settings.ResetAll"}}</button>
+      <button type="submit" class="bright"><i class="fa-solid fa-floppy-disk"></i> {{localize "DICEY.Settings.Save"}}</button>
+    </div>
   </footer>
 </div>

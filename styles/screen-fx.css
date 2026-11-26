@@ -7,6 +7,8 @@
   animation: dicey-sfx-life var(--ms, 4000ms) ease-in-out both;
 }
 .dicey-screen-fx svg { display: block; overflow: visible; }
+/* The Christmas lights hang over the interface (the chat panel too), still under windows. */
+.dicey-screen-fx.dicey-screen-fx-top { z-index: calc(var(--z-index-ui, 60) + 1); }
 
 @keyframes dicey-sfx-life {
   0% { opacity: 0; }

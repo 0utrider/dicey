@@ -6,6 +6,8 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 const t = (key) => game.i18n.localize(key);
 
+const OUTPOST_URL = "https://0utrider.github.io/outpost/";
+
 /** Whether two field values are the same (2 vs "2", "#FF9D00" vs "#ff9d00", arrays by their sorted members). */
 const same = (a, b) => norm(a) === norm(b);
 const norm = (v) => (Array.isArray(v) ? [...v].sort().join("\u0001") : String(v ?? "").toLowerCase());
@@ -24,7 +26,7 @@ export class DiceySettings extends HandlebarsApplicationMixin(ApplicationV2) {
     id: "dicey-settings",
     tag: "form",
     classes: ["dicey-settings"],
-    window: { title: "DICEY.Settings.Title", icon: "fa-solid fa-bomb", resizable: true },
+    window: { title: "DICEY.Settings.Title", icon: "dicey-glyph", resizable: true },
     position: { width: 1040, height: 680 },
     form: { handler: DiceySettings.#onSubmit, closeOnSubmit: false, submitOnChange: false },
     actions: {
@@ -33,6 +35,8 @@ export class DiceySettings extends HandlebarsApplicationMixin(ApplicationV2) {
       reset: DiceySettings.#onReset,
       resetAll: DiceySettings.#onResetAll,
       openThemes: DiceySettings.#onOpenThemes,
+      openTest: DiceySettings.#onOpenTest,
+      openOutpost: DiceySettings.#onOpenOutpost,
     },
   };
 
@@ -83,6 +87,7 @@ export class DiceySettings extends HandlebarsApplicationMixin(ApplicationV2) {
       isGM,
       query: this.#query,
       icon: `modules/${PACKAGE_ID}/assets/icons/dicey-64.webp`,
+      outpostIcon: `modules/${PACKAGE_ID}/assets/icons/outpost-128.webp`,
       note: isGM ? t("DICEY.Settings.NoteGM") : t("DICEY.Settings.Note"),
       tabs: declaration.sections.map((s) => ({
         id: s.id,
@@ -228,7 +233,6 @@ export class DiceySettings extends HandlebarsApplicationMixin(ApplicationV2) {
     if (f) this.#reset(f);
   }
 
-  /** Every field back to its default. Form only: nothing is stored until Save. */
   /** Opens Dicer's Dice Themes window, the way its own settings menu does. */
   static #onOpenThemes() {
     const menu = game.modules.get("dicer")?.active && game.settings.menus.get("dicer.themeBrowser");
@@ -236,6 +240,18 @@ export class DiceySettings extends HandlebarsApplicationMixin(ApplicationV2) {
     else ui.notifications.warn(game.i18n.localize("DICEY.Settings.NoDicer"));
   }
 
+  /** The effects test stays under the dice, so this window gets out of its way (unsaved changes are kept). */
+  static async #onOpenTest() {
+    await this.minimize();
+    game.modules.get(PACKAGE_ID).api.effectsTest();
+  }
+
+  /** A new tab, so the game stays open. */
+  static #onOpenOutpost() {
+    window.open(OUTPOST_URL, "_blank", "noopener,noreferrer");
+  }
+
+  /** Every field back to its default. Form only: nothing is stored until Save. */
   static #onResetAll() {
     for (const f of fieldsOf()) this.#reset(f);
   }
@@ -291,7 +307,7 @@ export function registerMenu() {
     name: "DICEY.Settings.Title",
     label: "DICEY.Settings.Open",
     hint: "DICEY.Settings.MenuHint",
-    icon: "fa-solid fa-bomb",
+    icon: "dicey-glyph",
     type: DiceySettings,
     restricted: false,
   });

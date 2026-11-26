@@ -421,21 +421,46 @@
 
 .dicey-set-footer {
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
+  justify-content: space-between;
   gap: 8px;
   padding: 8px 12px;
   border-top: 1px solid var(--dicey-line);
+}
+/* Links to other windows and pages at the left, Reset and Save at the right; each group wraps whole. */
+.dicey-set-links,
+.dicey-set-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dicey-set-actions {
+  margin-left: auto;
+  justify-content: flex-end;
 }
 .dicey-set-footer button {
   flex: none;
   width: auto;
   padding: 0 12px;
 }
-/* Dice themes sits on its own at the left, away from Reset and Save. */
-.dicey-set-footer .dicey-set-themes {
-  margin-right: auto;
+.dicey-set-footer .dicey-set-link {
   --button-border-color: var(--dicey-brand-hover);
   --button-hover-background-color: color-mix(in srgb, var(--dicey-brand) 30%, transparent);
+}
+
+.dicey-set-footer button img {
+  width: 18px;
+  height: 18px;
+  border: 0;
+  flex: none;
+}
+/* Dicey's mark where Foundry wants an icon class (window title, Configure Settings button). */
+i.dicey-glyph {
+  display: inline-block;
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: middle;
+  background: url("../assets/icons/dicey-mark-64.webp") center / contain no-repeat;
 }
 
 /* ---- Damage type map dropdowns -------------------------------------------- */
@@ -517,7 +542,11 @@
 
 /* Dicey settings button in Dicer's theme browser toolbar (icon only). */
 .dicer-theme-browser .dicer-toolbar-actions .dicey-open-settings {
-  padding: 0 6px;
+  /* Dicer's icon buttons are a fixed 28 px square: padding would squeeze the mark */
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   --button-border-color: var(--dicey-brand-hover);
   --button-background-color: color-mix(in srgb, var(--dicey-brand) 22%, transparent);
   border-color: var(--dicey-brand-hover);
@@ -526,8 +555,9 @@
 .dicer-theme-browser .dicer-toolbar-actions .dicey-open-settings img {
   width: 18px;
   height: 18px;
+  flex: none;
+  object-fit: contain;
   border: none;
-  vertical-align: middle;
 }
 .dicer-theme-browser .dicer-toolbar-actions .dicey-open-settings:hover {
   --button-hover-border-color: var(--dicey-brand-hover);
@@ -587,6 +617,15 @@
 .dicey-welcome .form-footer { padding: 10px 14px 14px; border-top: 1px solid color-mix(in srgb, var(--dicey-brand) 35%, transparent); }
 .dicey-welcome .form-footer button { --button-background-color: color-mix(in srgb, var(--dicey-brand) 25%, transparent); --button-text-color: #fff; --button-border-color: color-mix(in srgb, var(--dicey-brand) 70%, transparent); --button-hover-background-color: var(--dicey-brand); }
 .dicey-welcome .form-footer button[data-action="close"] { --button-background-color: var(--dicey-brand); --button-hover-background-color: var(--dicey-brand-hover); }
+
+/* A test roll in chat: purple edge and tag, so it cannot pass for a real one. */
+.dicey-test-message {
+  border: 2px solid #7000d6 !important;
+}
+.dicey-test-mark {
+  text-align: center;
+  margin-bottom: 4px;
+}
 
 /* ---- effects test (features/effects-test.js); takes the brand colours from .dicey-settings ---- */
 .dicey-test .window-content {

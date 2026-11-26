@@ -678,8 +678,9 @@ function splatSmall(svg, w, h, colour = "#6b3a1a", shine = "rgba(255,220,170,.35
 
 export const SCREEN_FX = {
   // no sound of its own: every set that hangs the lights plays a jingle (sleigh bells are one of them)
-  "lights-xmas": { ms: 4600, draw: lightsXmas },
-  "lights-krampus": { ms: 3800, draw: lightsKrampus, sound: sound("wreck.ogg", 0.4) },
+  // top: hung over Foundry's side panels too (the chat), still under its windows
+  "lights-xmas": { ms: 4600, draw: lightsXmas, top: true },
+  "lights-krampus": { ms: 3800, draw: lightsKrampus, sound: sound("wreck.ogg", 0.4), top: true },
   // timing and sound follow the night's candle count (one sound file per night, tools/make-sounds.py)
   "candles-hanukkah": {
     get ms() { return Math.round((2.3 + menorahNight() * 0.26) * 1000); },
@@ -727,7 +728,7 @@ export function playScreenFx(name) {
   const w = window.innerWidth;
   const h = window.innerHeight;
   const root = document.createElement("div");
-  root.className = "dicey-screen-fx";
+  root.className = fx.top ? "dicey-screen-fx dicey-screen-fx-top" : "dicey-screen-fx";
   root.setAttribute("aria-hidden", "true");
   root.style.setProperty("--ms", `${fx.ms}ms`);
   const svg = document.createElementNS(NS, "svg");

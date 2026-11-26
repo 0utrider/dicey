@@ -4,6 +4,7 @@ import { effective } from "../settings.js";
 import { SCREEN_FX, clearScreenFx, playScreenFx, screenFxShowing, setMenorahNight } from "../screen-fx.js";
 import { HOLIDAY_SETS, isLoaded, loadHoliday } from "./themes.js";
 import { JINGLE_POOL, playJingle } from "../jingles.js";
+import { HATS, forceHat, forcedHat, hatInSeason, petHatsSupported } from "./pet-hats.js";
 
 /**
  * Effects test: a GM window for trying Dicey's effects (macro "Dicey Effects Test", or
@@ -14,11 +15,16 @@ import { JINGLE_POOL, playJingle } from "../jingles.js";
  * Dicer throws the dice with the set's look, rule effects and sounds, and Dicey's screen
  * effects follow. Once the roll finishes, the user's own default is put back. If the page goes away
  * mid-roll, the next load puts it back (`RESTORE`).
+ *
+ * Its rolls have chosen results, so only a GM can make them, and each one is marked as a test: a tag
+ * in the flavor and on the roll card, and a flag on the message.
  */
 
 export const id = "effectsTest";
 
 const RESTORE = `${DATA_ID}.effectsTestRestore`; // localStorage: this user's default while a test roll runs
+const PETS_RESTORE = `${DATA_ID}.effectsTestPets`; // localStorage: Dicer pet settings this test turned on
+const PET_SWITCHES = ["showPets", "petAccessories"];
 const OUTCOMES = { nat20: 20, nat1: 1, land: null };
 const t = (key, data) => (data ? game.i18n.format(key, data) : game.i18n.localize(key));
 const esc = (s) => foundry.utils.escapeHTML(String(s ?? ""));
@@ -39,6 +45,7 @@ async function setDefault({ global, theme }) {
 
 /** Puts back a default left over from a test roll that did not finish (the page was closed mid-roll). */
 async function restoreLeftover() {
+  petsBack();
   const saved = localStorage.getItem(RESTORE);
   if (!saved) return;
   localStorage.removeItem(RESTORE);
@@ -49,8 +56,44 @@ async function restoreLeftover() {
   }
 }
 
+/** Turns this user's Dicer pets and pet accessories on for the test, if they are off (put back by petsBack). */
+async function petsOn() {
+  if (localStorage.getItem(PETS_RESTORE)) return;
+  const off = PET_SWITCHES.filter((k) => game.settings.settings.has(`dicer.${k}`) && game.settings.get("dicer", k) === false);
+  if (!off.length) return;
+  localStorage.setItem(PETS_RESTORE, JSON.stringify(off));
+  for (const k of off) await game.settings.set("dicer", k, true);
+}
+
+/** Puts back the pet switches the test turned on (also after a page closed mid-test). */
+async function petsBack() {
+  const saved = localStorage.getItem(PETS_RESTORE);
+  if (!saved) return;
+  localStorage.removeItem(PETS_RESTORE);
+  try {
+    for (const k of JSON.parse(saved)) await game.settings.set("dicer", k, false);
+  } catch (err) {
+    console.warn(`${PACKAGE_ID} | could not put back the pet settings from the effects test`, err);
+  }
+}
+
+/** The tag on a test roll. The colours are inline too, so it still shows with the module off. */
+const testTag = () =>
+  `<span class="dicey-test-tag" style="display:inline-block;padding:1px 8px;border-radius:4px;background:#7000d6;color:#fff;font-weight:bold;text-transform:uppercase">${esc(t("DICEY.Test.Tag"))}</span>`;
+
+/** Puts the tag on the roll card itself, on every client, whatever the flavor says by now. */
+function markTestRoll(message, html) {
+  if (!message.flags?.[DATA_ID]?.effectsTest) return;
+  html.classList.add("dicey-test-message");
+  // the flavor already shows it (one tag is enough); a card whose flavor is hidden or dropped gets its own
+  if (html.querySelector(".dicey-test-tag")) return;
+  const card = html.querySelector(".dice-roll") ?? html.querySelector(".message-content");
+  card?.insertAdjacentHTML("afterbegin", `<div class="dicey-test-mark">${testTag()}</div>`);
+}
+
 /** Rolls a d20 fixed at `value` with `themeId` as this user's default, then puts the default back. */
 async function testRoll(themeId, value, { everyone = false } = {}) {
+  if (!game.user.isGM) throw new Error(t("DICEY.Test.GMOnly"));
   const before = snapshot();
   localStorage.setItem(RESTORE, JSON.stringify(before));
   let hook = null;
@@ -62,13 +105,14 @@ async function testRoll(themeId, value, { everyone = false } = {}) {
     const roll = await new Roll("1d20").evaluate();
     roll.dice[0].results[0].result = value;
     roll._total = value;
+    roll.options.diceyEffectsTest = true; // goes wherever the roll's data goes
     let messageId = null;
     const finished = new Promise((resolve) => {
       hook = Hooks.on("diceSoNiceRollComplete", (id) => id === messageId && resolve());
       setTimeout(resolve, 15000);
     });
     const message = await roll.toMessage(
-      { flavor: t("DICEY.Test.Flavor") },
+      { flavor: testTag(), flags: { [DATA_ID]: { effectsTest: true } } },
       { rollMode: everyone ? CONST.DICE_ROLL_MODES.PUBLIC : CONST.DICE_ROLL_MODES.SELF },
     );
     messageId = message.id;
@@ -95,7 +139,7 @@ function holidaysWithEffects() {
 
 const { ApplicationV2 } = foundry.applications.api;
 
-export class EffectsTest extends ApplicationV2 {
+class EffectsTest extends ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: "dicey-effects-test",
     classes: ["dicey-settings", "dicey-test"],
@@ -106,6 +150,8 @@ export class EffectsTest extends ApplicationV2 {
       setRoll: EffectsTest.#onSetRoll,
       screenOnly: EffectsTest.#onScreenOnly,
       jingleOnly: EffectsTest.#onJingleOnly,
+      hat: EffectsTest.#onHat,
+      petRoll: EffectsTest.#onPetRoll,
       stop: EffectsTest.#onStop,
     },
   };
@@ -157,6 +203,20 @@ export class EffectsTest extends ApplicationV2 {
     for (const { sets } of groups) for (const s of sets) if (s.jingle && s.jingle !== "random") tunes.add(s.jingle);
     const jingles = [...tunes].map((name) => btn("jingleOnly", esc(name), { tune: name }, "small")).join("");
 
+    // pet hats: each on now or by the calendar, and a plain roll so this user's pet comes to look
+    let hats;
+    if (!petHatsSupported()) hats = `<p class="dicey-set-note">${esc(t("DICEY.Test.HatsNoDicer"))}</p>`;
+    else {
+      const worn = forcedHat();
+      const onFor = (k) => (game.settings.settings.has(`dicer.${k}`) ? game.settings.get("dicer", k) !== false : true);
+      const accessories = onFor("petAccessories");
+      const rows = HATS.map((h) => {
+        const state = worn === h.slug ? "DICEY.Test.HatOn" : hatInSeason(h) ? "DICEY.Test.HatSeason" : "DICEY.Test.HatOff";
+        return `<div class="dicey-test-set"><span>${esc(t(h.label))} <small>${esc(t(state))}</small></span>${btn("hat", esc(t(worn === h.slug ? "DICEY.Test.HatCalendar" : "DICEY.Test.HatWear")), { hat: h.slug }, "small")}</div>`;
+      }).join("");
+      hats = `<div class="dicey-test-row">${chip("DICEY.Test.Pets", onFor("showPets"))}${chip("DICEY.Test.PetAccessories", accessories)}${btn("petRoll", `<i class="fa-solid fa-paw"></i> ${esc(t("DICEY.Test.PetRoll"))}`, {}, "small")}</div>${rows}`;
+    }
+
     return `
       <div class="dicey-test-root">
         <header class="dicey-set-top">
@@ -178,6 +238,7 @@ export class EffectsTest extends ApplicationV2 {
           <section><h3>${esc(t("DICEY.Test.BySet"))}</h3><p class="dicey-set-note">${esc(t("DICEY.Test.BySetHint"))}</p>${bySet}</section>
           <section><h3>${esc(t("DICEY.Test.Only"))}</h3><p class="dicey-set-note">${esc(t("DICEY.Test.OnlyHint"))}</p><div class="dicey-test-row">${only}</div></section>
           <section><h3>${esc(t("DICEY.Test.Jingles"))}</h3><p class="dicey-set-note">${esc(t("DICEY.Test.JinglesHint"))}</p><div class="dicey-test-row">${jingles}</div></section>
+          <section><h3>${esc(t("DICEY.Test.Hats"))}</h3><p class="dicey-set-note">${esc(t("DICEY.Test.HatsHint"))}</p>${hats}</section>
         </div>
       </div>`;
   }
@@ -188,6 +249,8 @@ export class EffectsTest extends ApplicationV2 {
 
   _onClose(options) {
     setMenorahNight(null);
+    if (forcedHat()) forceHat(null); // a hat put on for the test comes off with the window
+    petsBack(); // and pets this test turned on go back off
     super._onClose(options);
   }
 
@@ -266,6 +329,46 @@ export class EffectsTest extends ApplicationV2 {
     playJingle(target.dataset.tune, foundry.utils.randomID());
   }
 
+  /** Puts the hat on now, or back to the calendar if it is already on. */
+  static #onHat(_event, target) {
+    const slug = target.dataset.hat;
+    forceHat(forcedHat() === slug ? null : slug);
+    this.render();
+  }
+
+  /**
+   * A plain d20 with this user's own dice, so their pet comes to the roll: wearing the first hat if none
+   * is on, with this user's pets and pet accessories turned on for the test if they are off.
+   */
+  static async #onPetRoll() {
+    if (this.#busy) return ui.notifications.info(t("DICEY.Test.Busy"));
+    if (!forcedHat()) forceHat(HATS[0].slug);
+    await petsOn();
+    await this.render();
+    this.#play(async () => {
+      const roll = await new Roll("1d20").evaluate();
+      let messageId = null;
+      let hook = null;
+      const finished = new Promise((resolve) => {
+        hook = Hooks.on("diceSoNiceRollComplete", (id) => id === messageId && resolve());
+        setTimeout(resolve, 15000);
+      });
+      try {
+        roll.options.diceyEffectsTest = true; // a test roll, even with a random result
+        const message = await roll.toMessage(
+          { flavor: testTag(), flags: { [DATA_ID]: { effectsTest: true } } },
+          { rollMode: this.#everyone ? CONST.DICE_ROLL_MODES.PUBLIC : CONST.DICE_ROLL_MODES.SELF },
+        );
+        messageId = message.id;
+        await finished;
+      } finally {
+        Hooks.off("diceSoNiceRollComplete", hook);
+      }
+      // the window stays out of the way a little longer, while the pet reacts and settles
+      await new Promise((r) => setTimeout(r, 4000));
+    });
+  }
+
   static #onStop() {
     clearScreenFx();
   }
@@ -278,6 +381,7 @@ export function open() {
 
 export function init() {
   game.modules.get(PACKAGE_ID).api.effectsTest = open;
+  Hooks.on("renderChatMessageHTML", markTestRoll);
 }
 
 export function ready() {
