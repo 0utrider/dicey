@@ -1,6 +1,6 @@
 import { PACKAGE_ID } from "../constants.js";
 import { HOLIDAY_BY_ID, standing } from "../holiday-calendar.js";
-import { effective } from "../settings.js";
+import { effective, onSettingsChange } from "../settings.js";
 
 /**
  * Pet hats: seasonal models Dicer's dice pets wear (Dicer's `registerPetAccessory`, which older Dicer
@@ -38,7 +38,7 @@ export const HATS = [
       golem: { offset: { y: -0.15, z: -0.1 }, tilt: { x: -20 } },
       lantern: { offset: { y: -0.2, z: -0.3 }, tilt: { x: -55 } }, // over the handle
       robot: { offset: { x: -0.15, z: -0.1 }, tilt: { x: -40 } }, // square on its slanted top, right half
-      jester: { offset: { x: 0.2, y: -0.15 }, tilt: { z: -50 } }, // badly, over its own hat
+      jester: { scale: 1.3, offset: { x: 0.35, y: -0.2 }, tilt: { z: -60 } }, // badly, over its own hat and swallowing its left tail
     },
   },
 ];
@@ -87,5 +87,9 @@ export function init() {
     } catch (err) {
       console.warn(`${PACKAGE_ID} | could not register the pet hats`, err);
     }
+  });
+  // a holiday skipped or unskipped takes its hat off or puts it on now, not at the pet's next visit
+  onSettingsChange((key) => {
+    if (["holidaySkip", "policies"].includes(key)) register();
   });
 }

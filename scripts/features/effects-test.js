@@ -17,7 +17,7 @@ import { HATS, forceHat, forcedHat, hatInSeason, petHatsSupported } from "./pet-
  * mid-roll, the next load puts it back (`RESTORE`).
  *
  * Its rolls have chosen results, so only a GM can make them, and each one is marked as a test: a tag
- * in the flavor and on the roll card, and a flag on the message.
+ * in the flavor and on the roll card, and a flag on the message. Dicer keeps them out of Roll stats.
  */
 
 export const id = "effectsTest";
@@ -81,6 +81,9 @@ async function petsBack() {
 const testTag = () =>
   `<span class="dicey-test-tag" style="display:inline-block;padding:1px 8px;border-radius:4px;background:#7000d6;color:#fff;font-weight:bold;text-transform:uppercase">${esc(t("DICEY.Test.Tag"))}</span>`;
 
+/** Marks a test message as one, and has Dicer (1.4.16 and later) leave it out of Roll stats. */
+const testFlags = () => ({ [DATA_ID]: { effectsTest: true }, dicer: { noStats: true } });
+
 /** Puts the tag on the roll card itself, on every client, whatever the flavor says by now. */
 function markTestRoll(message, html) {
   if (!message.flags?.[DATA_ID]?.effectsTest) return;
@@ -112,7 +115,7 @@ async function testRoll(themeId, value, { everyone = false } = {}) {
       setTimeout(resolve, 15000);
     });
     const message = await roll.toMessage(
-      { flavor: testTag(), flags: { [DATA_ID]: { effectsTest: true } } },
+      { flavor: testTag(), flags: testFlags() },
       { rollMode: everyone ? CONST.DICE_ROLL_MODES.PUBLIC : CONST.DICE_ROLL_MODES.SELF },
     );
     messageId = message.id;
@@ -157,6 +160,7 @@ class EffectsTest extends ApplicationV2 {
   };
 
   #busy = false;
+  #everyoneOn = false; // the Everyone box, kept across renders (the pet roll and hats render first)
 
   async _renderHTML() {
     const groups = holidaysWithEffects();
@@ -230,7 +234,7 @@ class EffectsTest extends ApplicationV2 {
           ${chip("DICEY.Settings.screenFx.Name", effective("screenFx") !== false)}
           ${chip("DICEY.Settings.fxSound.Name", effective("fxSound") !== false)}
           ${chip("DICEY.Settings.jingles.Name", effective("jingles") !== false)}
-          <label class="dicey-test-everyone"><input type="checkbox" name="everyone"> ${esc(t("DICEY.Test.Everyone"))}</label>
+          <label class="dicey-test-everyone"><input type="checkbox" name="everyone"${this.#everyoneOn ? " checked" : ""}> ${esc(t("DICEY.Test.Everyone"))}</label>
           ${btn("stop", `<i class="fa-solid fa-stop"></i> ${esc(t("DICEY.Test.Stop"))}`, {}, "small")}
         </div>
         <div class="dicey-test-body">
@@ -247,6 +251,13 @@ class EffectsTest extends ApplicationV2 {
     content.innerHTML = result;
   }
 
+  _onRender(context, options) {
+    super._onRender(context, options);
+    this.element.querySelector('input[name="everyone"]')?.addEventListener("change", (event) => {
+      this.#everyoneOn = event.currentTarget.checked;
+    });
+  }
+
   _onClose(options) {
     setMenorahNight(null);
     if (forcedHat()) forceHat(null); // a hat put on for the test comes off with the window
@@ -255,7 +266,7 @@ class EffectsTest extends ApplicationV2 {
   }
 
   get #everyone() {
-    return !!this.element?.querySelector('input[name="everyone"]')?.checked;
+    return this.#everyoneOn;
   }
 
   /**
@@ -356,7 +367,7 @@ class EffectsTest extends ApplicationV2 {
       try {
         roll.options.diceyEffectsTest = true; // a test roll, even with a random result
         const message = await roll.toMessage(
-          { flavor: testTag(), flags: { [DATA_ID]: { effectsTest: true } } },
+          { flavor: testTag(), flags: testFlags() },
           { rollMode: this.#everyone ? CONST.DICE_ROLL_MODES.PUBLIC : CONST.DICE_ROLL_MODES.SELF },
         );
         messageId = message.id;

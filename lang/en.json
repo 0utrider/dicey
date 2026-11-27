@@ -123,7 +123,7 @@
   "DICEY.Test.GMOnly": "The effects test is for GMs.",
   "DICEY.Test.Hats": "Pet hats",
   "DICEY.Test.HatsHint": "Seasonal hats for Dicer's dice pets, worn while their holiday is in season. Roll for the pet puts a hat on and brings your pet, turning your pets and pet accessories on for the test if they are off. Only on your screen; closing this window puts it all back.",
-  "DICEY.Test.HatsNoDicer": "This Dicer cannot dress its pets yet (it has no pet accessories).",
+  "DICEY.Test.HatsNoDicer": "Pet hats need Dicer 1.4.16 or later.",
   "DICEY.Test.Pets": "Pets",
   "DICEY.Test.PetAccessories": "Pet accessories",
   "DICEY.Test.PetRoll": "Roll for the pet",

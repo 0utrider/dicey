@@ -66,7 +66,7 @@ Dicey also draws a few effects of its own, with no extra modules: a pine garland
 
 ## Pet hats
 
-In the Christmas season, Dicer's dice pets wear a Santa hat, fitted to each pet. This needs a Dicer release with pet accessories, which is not out yet; until then nothing changes. Skip Christmas in **Holidays to use** to leave the hat off, or turn off Dicer's **Pet accessories**.
+In the Christmas season, Dicer's dice pets wear a Santa hat, fitted to each pet. This needs Dicer 1.4.16 or later; on an older Dicer nothing changes. Skip Christmas in **Holidays to use** to leave the hat off, or turn off Dicer's **Pet accessories**.
 
 ## Settings
 
@@ -78,7 +78,7 @@ Dicey adds three macros, in a **Macros** compendium and copied into your world's
 
 - **Dicey Settings** opens the Dicey settings window.
 - **Dice Themes** opens Dicer's Dice Themes window.
-- **Dicey Effects Test** (GMs) opens a window for trying the holiday effects. A full roll rolls a d20 fixed to a natural 20, a natural 1 or anything between, with one of the holiday's sets, so the dice, their sounds, the screen effects and the jingles all play as in a game; your own dice set comes back after the roll. The rolls go to chat for you only unless you tick **Everyone sees the rolls**. The window sits under the dice, so the rolls land on top of it. Test rolls are tagged **Dicey Effects Test** in purple in chat, so they cannot pass for real rolls.
+- **Dicey Effects Test** (GMs) opens a window for trying the holiday effects. A full roll rolls a d20 fixed to a natural 20, a natural 1 or anything between, with one of the holiday's sets, so the dice, their sounds, the screen effects and the jingles all play as in a game; your own dice set comes back after the roll. The rolls go to chat for you only unless you tick **Everyone sees the rolls**. The window sits under the dice, so the rolls land on top of it. Test rolls are tagged **Dicey Effects Test** in purple in chat, so they cannot pass for real rolls. With Dicer 1.4.16 or later they are also left out of Roll stats.
 
 They are script macros, so Foundry's *Use Script Macros* permission decides who can run them (Trusted Player and above by default). The d20 icon is a [Font Awesome Free](https://fontawesome.com/license/free) icon by Fonticons, Inc. (CC BY 4.0), with the fill colour changed.
 
