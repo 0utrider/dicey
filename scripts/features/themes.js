@@ -1,6 +1,6 @@
 import { PACKAGE_ID, themeScope } from "../constants.js";
 import { HOLIDAY_BY_ID, standing } from "../holiday-calendar.js";
-import { resolveFont } from "../fonts.js";
+import { registerFonts, resolveFont } from "../fonts.js";
 import { ledMaterial } from "../led-material.js";
 import { effective } from "../settings.js";
 import { SCREEN_FX } from "../screen-fx.js";
@@ -36,6 +36,8 @@ export const SET_INFO = new Map();
 
 /** True when a pack entry plays sounds of its own: a rule sound of ours, a jingle, or a screen effect with one. */
 function ownSounds(entry) {
+  // damage dice turn up in most rolls: their short landing sounds leave the dice pets alone
+  if (entry.group === "damage") return false;
   return (
     !!entry.jingle ||
     (entry.rules ?? []).some((r) => typeof r.sound?.src === "string" && (r.sound.src.startsWith("dicey:") || r.sound.src.includes("/assets/sounds/"))) ||
@@ -157,6 +159,33 @@ function register(entry) {
   return true;
 }
 
+const DAMAGE_ENTRIES = new Map(); // slug -> pack entry of a damage set, for its quiet copy
+const QUIET = new Set(); // theme ids of the quiet copies registered so far
+
+/**
+ * A damage set's quiet copy: the same look and effects, without its rule sounds. A damage type the GM
+ * gave a custom sound in Dicer's damage type map uses it, so the custom sound replaces ours as it
+ * replaces Dicer's own. Dicer only swaps a built-in set's landing sound. The copy is left out of the
+ * theme browser and Dicey's lists (it is not in REGISTERED). Returns its theme id, or null.
+ */
+export function quietDamageSet(slug) {
+  const scope = themeScope();
+  const themeId = `${scope}.${slug}-quiet`;
+  if (QUIET.has(themeId)) return themeId;
+  const entry = DAMAGE_ENTRIES.get(slug);
+  if (!entry || !dicerApi) return null;
+  const { slug: _s, tier, holiday, featured, group, fx, screen, jingle, leds, ...theme } = entry;
+  theme.rules = (theme.rules ?? [])
+    .map(({ sound, ...rule }) => rule)
+    .filter((rule) => rule.effect || rule.moment || rule.macro);
+  if (theme.appearance?.numbers?.font) {
+    theme.appearance = { ...theme.appearance, numbers: { ...theme.appearance.numbers, font: resolveFont(theme.appearance.numbers.font) } };
+  }
+  if (!dicerApi.registerTheme({ ...theme, id: themeId, perType: {} }, { moduleId: scope, showInAll: false })) return null;
+  QUIET.add(themeId);
+  return themeId;
+}
+
 /** True once a holiday's sets are registered with Dicer. */
 export const isLoaded = (holidayId) => HOLIDAY_SETS.has(holidayId) && !pending.has(holidayId);
 
@@ -203,6 +232,7 @@ async function loadAll(api) {
   total += free.length;
   for (const e of free) {
     noteInfo(e);
+    if (e.group === "damage") DAMAGE_ENTRIES.set(e.slug, e);
     if (register(e)) ok++;
   }
 
@@ -259,6 +289,11 @@ export function init() {
   Hooks.on("updateUser", (_doc, changes) => loadUsed(changes));
   Hooks.on("updateActor", (_doc, changes) => loadUsed(changes));
   Hooks.once("dicer.ready", async (api) => {
+    try {
+      registerFonts(api);
+    } catch (err) {
+      console.error(`${PACKAGE_ID} | failed to register fonts`, err);
+    }
     try {
       await loadAll(api);
       Hooks.callAll("dicey.themesLoaded");

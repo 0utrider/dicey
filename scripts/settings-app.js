@@ -12,7 +12,9 @@ const OUTPOST_URL = "https://0utrider.github.io/outpost/";
 const same = (a, b) => norm(a) === norm(b);
 const norm = (v) => (Array.isArray(v) ? [...v].sort().join("\u0001") : String(v ?? "").toLowerCase());
 
-const fieldsOf = () => declaration.sections.flatMap((s) => s.groups.flatMap((g) => g.fields));
+/** A section's fields this user may see (`gmOnly` ones are for the GM). */
+const fieldsIn = (section) => section.groups.flatMap((g) => g.fields).filter((f) => !f.gmOnly || game.user.isGM);
+const fieldsOf = () => declaration.sections.flatMap(fieldsIn);
 const optionsOf = (f) => (f.optionsFn ? f.optionsFn() : f.options) ?? [];
 
 /**
@@ -89,13 +91,15 @@ export class DiceySettings extends HandlebarsApplicationMixin(ApplicationV2) {
       icon: `modules/${PACKAGE_ID}/assets/icons/dicey-64.webp`,
       outpostIcon: `modules/${PACKAGE_ID}/assets/icons/outpost-128.webp`,
       note: isGM ? t("DICEY.Settings.NoteGM") : t("DICEY.Settings.Note"),
-      tabs: declaration.sections.map((s) => ({
-        id: s.id,
-        icon: s.icon,
-        label: t(s.label),
-        active: s.id === this.#tab,
-        rows: s.groups.flatMap((g) => g.fields).map(row),
-      })),
+      tabs: declaration.sections
+        .filter((s) => fieldsIn(s).length)
+        .map((s) => ({
+          id: s.id,
+          icon: s.icon,
+          label: t(s.label),
+          active: s.id === this.#tab,
+          rows: fieldsIn(s).map(row),
+        })),
     };
   }
 

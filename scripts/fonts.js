@@ -31,3 +31,14 @@ export function resolveFont(font) {
   const f = FONTS[font.slice(6)];
   return f ? `file:modules/${PACKAGE_ID}/assets/fonts/${f.file}` : undefined;
 }
+
+/**
+ * Offers every font above in Dicer's appearance editor, as a row of buttons under Dicey's name
+ * (api.registerFont, Dicer 1.4.16 and later). A pick there is the same `file:` font a pack names.
+ */
+export function registerFonts(api) {
+  if (typeof api?.registerFont !== "function") return;
+  for (const [key, f] of Object.entries(FONTS)) {
+    api.registerFont(PACKAGE_ID, { id: `${PACKAGE_ID}.${key}`, label: f.label, file: `modules/${PACKAGE_ID}/assets/fonts/${f.file}` });
+  }
+}

@@ -23,9 +23,11 @@ https://github.com/0utrider/dicey/releases/latest/download/module.json
 
 A set of 14 damage type dice themes plus Starry Night, built for readable numbers (every theme uses the blackletter font, including over animated interiors): acid, bleed, cold, electricity, fire, force, mental, physical, poison, precision, sonic, spirit, vitality, void.
 
-They show up in Dicer's theme browser by name (`Fire`, `Cold` and so on) with a **Things Got Dicey** tag, and a landing effect and sound where the matching Dicer built-in has one.
+They show up in Dicer's theme browser by name (`Fire`, `Cold` and so on) with a **Things Got Dicey** tag, and a landing effect and sound where the matching Dicer built-in has one. Acid, Poison and Mental have their own: a corrosive splash with a chemical hiss, purple fumes with thick drips and a sinking gulp, and a psychic ping that swells in backwards. Effects and sounds play for these sets by default or as a **World choice**; Dicer plays none for a **My override** pick.
 
-Dicer's **Damage type map** only lists its own looks, so this module lays out the **World choice** and **My override** dropdowns as: Default, then **Things Got Dicey · Damage types**, then Dicer's own choices, then **Things Got Dicey** (every other Dicey set, holiday sets included). Nothing is changed until you pick one: everything stays on Dicer's defaults.
+Damage dice use these sets by default, for everyone in the world. A GM can go back to Dicer's own with **Dicey damage dice** on the **Damage dice** tab of Dicey settings. A type the GM or a player has picked in Dicer's damage type map keeps that pick, and nothing is written into Dicer's settings.
+
+Dicer's **Damage type map** only lists its own looks, so this module lays out the **World choice** and **My override** dropdowns as: Default, then **Things Got Dicey · Damage types**, then Dicer's own choices, then **Things Got Dicey** (every other Dicey set, holiday sets included). **Default** is the Dicey damage set while **Dicey damage dice** is on.
 
 ## Holiday dice
 

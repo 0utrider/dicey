@@ -35,6 +35,13 @@ export const declaration = {
       ],
     },
     {
+      // One value for the whole world, so only a GM sees it and there is no "Everyone" choice.
+      id: "damage",
+      label: L("Tab.damage"),
+      icon: "fa-solid fa-burst",
+      groups: [{ fields: [field("damageSets", "switch", { policy: false, gmOnly: true })] }],
+    },
+    {
       // Effects cost frames and make noise: a GM can set a default, never lock a player into them.
       id: "effects",
       label: L("Tab.effects"),

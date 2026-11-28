@@ -21,8 +21,12 @@ export function modesFor(key) {
   return Array.isArray(field?.policy) ? field.policy : MODES;
 }
 
-/** The player settings Dicey registers: type and default. The window itself is declared in settings-declaration.js. */
+/**
+ * The settings Dicey's window shows: type, default and scope (client unless it says world). The window
+ * itself is declared in settings-declaration.js.
+ */
 export const SETTINGS = {
+  damageSets: { type: Boolean, default: true, scope: "world" },
   holidayDice: { type: Boolean, default: true },
   holidayPick: { type: String, default: "random" },
   holidaySkip: { type: Array, default: [] },
@@ -72,7 +76,7 @@ const changed = (key) => {
 export function registerSettings() {
   for (const [key, def] of Object.entries(SETTINGS)) {
     game.settings.register(DATA_ID, key, {
-      scope: "client",
+      scope: def.scope ?? "client",
       config: false,
       type: def.type === Array ? Array : def.type,
       default: def.default,

@@ -1,10 +1,73 @@
 import { themeScope } from "../constants.js";
 import { HOLIDAYS } from "../holiday-calendar.js";
-import { REGISTERED, HOLIDAY_SETS, isLoaded, loadHoliday } from "./themes.js";
+import { effective, onSettingsChange } from "../settings.js";
+import { REGISTERED, HOLIDAY_SETS, isLoaded, loadHoliday, quietDamageSet } from "./themes.js";
 
 export const id = "damageMap";
 
 const EDITOR_ID = "dicer-damage-map-editor";
+
+/** Damage type -> the slug of our set, which is also the id of Dicer's built-in set for that type. */
+export const TYPE_SETS = {
+  ...Object.fromEntries(
+    ["acid", "bleed", "cold", "electricity", "fire", "force", "mental", "poison", "precision", "sonic", "spirit", "vitality", "void"].map((t) => [t, t]),
+  ),
+  bludgeoning: "physical",
+  piercing: "physical",
+  slashing: "physical",
+  lightning: "electricity",
+  thunder: "sonic",
+  radiant: "vitality",
+  necrotic: "void",
+  psychic: "mental",
+  healing: "vitality",
+};
+
+let applied = false;
+
+/** True when the GM gave this damage type a custom sound in Dicer's damage type map (Dicer's own test). */
+function hasCustomSound(type) {
+  let all = null;
+  try {
+    all = game.settings.get("dicer", "damageTypeSounds");
+  } catch {
+    return false;
+  }
+  const entry = all?.[type];
+  return !!entry && typeof entry === "object" && typeof entry.src === "string" && !!entry.src;
+}
+
+/** Dicer 1.5.2 lets a custom damage sound replace a registered theme's landing sounds itself. */
+const NATIVE_CUSTOM_SOUND = "1.5.2";
+
+/** True on a Dicer older than 1.5.2, where a custom sound needs our quiet copy of the set. */
+function needsQuietCopy() {
+  const version = game.modules.get("dicer")?.version;
+  return !version || foundry.utils.isNewerVersion(NATIVE_CUSTOM_SOUND, version);
+}
+
+/**
+ * Makes our damage sets the default for each damage type, through Dicer's module defaults: they sit
+ * under the GM's World choice and a player's override, and nothing is stored in Dicer's settings.
+ * On a Dicer older than 1.5.2, a type with a custom sound gets the set's quiet copy, so the custom
+ * sound replaces ours. From 1.5.2, Dicer does that itself.
+ * Dicer cannot remove a default, so switching off hands each type back to its built-in set by name.
+ */
+function applyDefaults() {
+  if (!game.dice3d?.addDamageTypeDefaults || !REGISTERED.size) return;
+  const on = effective("damageSets") !== false;
+  if (!on && !applied) return;
+  const scope = themeScope();
+  const quiet = needsQuietCopy();
+  const map = {};
+  for (const [type, slug] of Object.entries(TYPE_SETS)) {
+    if (!REGISTERED.has(`${scope}.${slug}`)) continue;
+    if (!on) map[type] = slug;
+    else map[type] = (quiet && hasCustomSound(type) && quietDamageSet(slug)) || `${scope}.${slug}`;
+  }
+  game.dice3d.addDamageTypeDefaults(map);
+  applied = on;
+}
 
 /**
  * Dicer's damage type map builds its dropdowns from a closed list, so registered add-on themes
@@ -96,4 +159,11 @@ function addOptions(app, element) {
 
 export function init() {
   Hooks.on("renderApplicationV2", addOptions);
+  // either can come first: our themes registering, or Dicer's dice API appearing
+  Hooks.on("dicey.themesLoaded", applyDefaults);
+  Hooks.once("diceSoNiceReady", applyDefaults);
+  onSettingsChange((key) => key === "damageSets" && applyDefaults());
+  // the GM adds or clears a custom damage type sound in Dicer's damage type map
+  Hooks.on("updateSetting", (setting) => setting.key === "dicer.damageTypeSounds" && applyDefaults());
+  Hooks.on("createSetting", (setting) => setting.key === "dicer.damageTypeSounds" && applyDefaults());
 }

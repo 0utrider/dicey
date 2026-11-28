@@ -2,7 +2,8 @@ import { DATA_ID, PACKAGE_ID } from "../constants.js";
 import { HOLIDAYS } from "../holiday-calendar.js";
 import { effective } from "../settings.js";
 import { SCREEN_FX, clearScreenFx, playScreenFx, screenFxShowing, setMenorahNight } from "../screen-fx.js";
-import { HOLIDAY_SETS, isLoaded, loadHoliday } from "./themes.js";
+import { HOLIDAY_SETS, REGISTERED, isLoaded, loadHoliday } from "./themes.js";
+import { TYPE_SETS } from "./damage-map.js";
 import { JINGLE_POOL, playJingle } from "../jingles.js";
 import { HATS, forceHat, forcedHat, hatInSeason, petHatsSupported } from "./pet-hats.js";
 
@@ -127,6 +128,43 @@ async function testRoll(themeId, value, { everyone = false } = {}) {
   }
 }
 
+/**
+ * A damage roll as a game makes one: two d6 of `type` (the term's flavor names it, which Dicer reads in
+ * any system), thrown through the damage type map as players see it, custom sounds included.
+ */
+async function damageRoll(type, { everyone = false } = {}) {
+  if (!game.user.isGM) throw new Error(t("DICEY.Test.GMOnly"));
+  const roll = await new Roll(`2d6[${type}]`).evaluate();
+  roll.options.diceyEffectsTest = true;
+  let messageId = null;
+  let hook = null;
+  const finished = new Promise((resolve) => {
+    hook = Hooks.on("diceSoNiceRollComplete", (id) => id === messageId && resolve());
+    setTimeout(resolve, 15000);
+  });
+  try {
+    const message = await roll.toMessage(
+      { flavor: testTag(), flags: testFlags() },
+      { rollMode: everyone ? CONST.DICE_ROLL_MODES.PUBLIC : CONST.DICE_ROLL_MODES.SELF },
+    );
+    messageId = message.id;
+    await finished;
+  } finally {
+    Hooks.off("diceSoNiceRollComplete", hook);
+  }
+}
+
+/** Our damage sets with the damage types that use them: `[{ name, types }]`, in pack order. */
+function damageSets() {
+  const out = [];
+  for (const info of REGISTERED.values()) {
+    if (info.group !== "damage") continue;
+    const types = Object.entries(TYPE_SETS).filter(([, slug]) => slug === info.slug).map(([type]) => type);
+    if (types.length) out.push({ name: info.name, types });
+  }
+  return out;
+}
+
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
 const valueFor = (outcome) => OUTCOMES[outcome] ?? 2 + Math.floor(Math.random() * 18);
 
@@ -155,6 +193,7 @@ class EffectsTest extends ApplicationV2 {
       jingleOnly: EffectsTest.#onJingleOnly,
       hat: EffectsTest.#onHat,
       petRoll: EffectsTest.#onPetRoll,
+      damageRoll: EffectsTest.#onDamageRoll,
       stop: EffectsTest.#onStop,
     },
   };
@@ -221,6 +260,10 @@ class EffectsTest extends ApplicationV2 {
       hats = `<div class="dicey-test-row">${chip("DICEY.Test.Pets", onFor("showPets"))}${chip("DICEY.Test.PetAccessories", accessories)}${btn("petRoll", `<i class="fa-solid fa-paw"></i> ${esc(t("DICEY.Test.PetRoll"))}`, {}, "small")}</div>${rows}`;
     }
 
+    const damage = damageSets()
+      .map(({ name, types }) => `<div class="dicey-test-set"><span>${esc(name)}</span>${types.map((type) => btn("damageRoll", esc(type), { type }, "small")).join("")}</div>`)
+      .join("");
+
     return `
       <div class="dicey-test-root">
         <header class="dicey-set-top">
@@ -240,6 +283,7 @@ class EffectsTest extends ApplicationV2 {
         <div class="dicey-test-body">
           <section><h3>${esc(t("DICEY.Test.Full"))}</h3><p class="dicey-set-note">${esc(t("DICEY.Test.FullHint"))}</p>${full}</section>
           <section><h3>${esc(t("DICEY.Test.BySet"))}</h3><p class="dicey-set-note">${esc(t("DICEY.Test.BySetHint"))}</p>${bySet}</section>
+          <section><h3>${esc(t("DICEY.Test.Damage"))}</h3><p class="dicey-set-note">${esc(t("DICEY.Test.DamageHint"))}</p><div class="dicey-test-row">${chip("DICEY.Settings.damageSets.Name", game.settings.get(DATA_ID, "damageSets") !== false)}</div>${damage}</section>
           <section><h3>${esc(t("DICEY.Test.Only"))}</h3><p class="dicey-set-note">${esc(t("DICEY.Test.OnlyHint"))}</p><div class="dicey-test-row">${only}</div></section>
           <section><h3>${esc(t("DICEY.Test.Jingles"))}</h3><p class="dicey-set-note">${esc(t("DICEY.Test.JinglesHint"))}</p><div class="dicey-test-row">${jingles}</div></section>
           <section><h3>${esc(t("DICEY.Test.Hats"))}</h3><p class="dicey-set-note">${esc(t("DICEY.Test.HatsHint"))}</p>${hats}</section>
@@ -378,6 +422,10 @@ class EffectsTest extends ApplicationV2 {
       // the window stays out of the way a little longer, while the pet reacts and settles
       await new Promise((r) => setTimeout(r, 4000));
     });
+  }
+
+  static #onDamageRoll(_event, target) {
+    this.#play(async () => damageRoll(target.dataset.type, { everyone: this.#everyone }));
   }
 
   static #onStop() {
